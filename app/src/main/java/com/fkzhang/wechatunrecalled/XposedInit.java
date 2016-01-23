@@ -20,7 +20,7 @@ public class XposedInit implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
 
-        XposedBridge.log(loadPackageParam.packageName);
+//        XposedBridge.log(loadPackageParam.packageName);
 
         String packageName = loadPackageParam.packageName;
         if (!(packageName.contains("com.tencen") && packageName.contains("mm")))
