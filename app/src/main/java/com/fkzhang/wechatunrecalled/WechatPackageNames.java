@@ -15,6 +15,15 @@ public class WechatPackageNames {
     public String dbField;
     public String dbMethod2;
     public String updateMsgId;
+    public String contextGetter;
+    public String iconClass;
+    public String iconMethod;
+    public String imageClass;
+    public String imageMethod1;
+    public String imageMethod2;
+    public String avatarClass;
+    public String avatarMethod1;
+    public String avatarMethod2;
 
     public WechatPackageNames(String packageName, String version) {
         this.packageName = packageName;
@@ -46,6 +55,15 @@ public class WechatPackageNames {
         dbMethod1 = "sS";
         dbMethod2 = "qQ";
         dbField = "dGo";
+        contextGetter += "ai";
+        iconClass += ".booter.notification.a.d";
+        iconMethod = "mX";
+        imageClass += ".z.ar";
+        imageMethod1 = "zZ";
+        imageMethod2 = "g";
+        avatarClass += ".p.af";
+        avatarMethod1 = "uQ";
+        avatarMethod2 = "b";
     }
 
     private void set635() {
@@ -58,6 +76,15 @@ public class WechatPackageNames {
         dbMethod2 = "rM";
         dbField = "bts";
         updateMsgId = "aPy";
+        contextGetter += "y";
+        iconClass += ".an.a";
+        iconMethod = "aFT";
+        imageClass += ".z.n";
+        imageMethod1 = "Aw";
+        imageMethod2 = "hv";
+        avatarClass += ".p.n";
+        avatarMethod1 = "vI";
+        avatarMethod2 = "b";
     }
 
     private void set638() {
@@ -70,6 +97,15 @@ public class WechatPackageNames {
         dbMethod2 = "rj";
         dbField = "bww";
         updateMsgId = "aTT";
+        contextGetter += "z";
+        iconClass += ".an.a";
+        iconMethod = "aKh";
+        imageClass += ".z.n";
+        imageMethod1 = "zV";
+        imageMethod2 = "hC";
+        avatarClass += ".p.n";
+        avatarMethod1 = "vF";
+        avatarMethod2 = "b";
     }
 
     private void set639() {
@@ -82,6 +118,15 @@ public class WechatPackageNames {
         dbMethod2 = "rk";
         dbField = "bzj";
         updateMsgId = "aVP";
+        contextGetter += "y";
+        iconClass += ".ap.a";
+        iconMethod = "aMW";
+        imageClass += ".aa.n";
+        imageMethod1 = "zZ";
+        imageMethod2 = "hF";
+        avatarClass += ".q.n";
+        avatarMethod1 = "vi";
+        avatarMethod2 = "b";
     }
 
     private void initNames() {
@@ -94,5 +139,14 @@ public class WechatPackageNames {
         dbMethod2 = "";
         dbField = "";
         updateMsgId = "";
+        contextGetter = recallClass;
+        iconClass = this.packageName;
+        iconMethod = "";
+        imageClass = this.packageName;
+        imageMethod1 = "";
+        imageMethod2 = "";
+        avatarClass = this.packageName;
+        avatarMethod1 = "";
+        avatarMethod2 = "";
     }
 }

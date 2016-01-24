@@ -1,6 +1,9 @@
 package com.fkzhang.wechatunrecalled;
 
 import android.content.ContentValues;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 
 import java.util.Random;
 
@@ -8,6 +11,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
+import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 
 /**
@@ -99,6 +103,20 @@ public class WechatUnrecalledHook600 extends WechatUnrecalledHook {
 
     protected void updateMessageCount() {
         callMethod(callMethod(mStorageObject, "Cv", "message"), "aSC");
+    }
+
+    protected Bitmap getImage(String path) {
+        String str = null;
+        try {
+            str = (String) callMethod(callStaticMethod(mImgClss, mP.imageMethod1),
+                    mP.imageMethod2, path, "", "");
+        } catch (Exception e) {
+        }
+
+        if (TextUtils.isEmpty(str))
+            return null;
+
+        return BitmapFactory.decodeFile(str);
     }
 
 }

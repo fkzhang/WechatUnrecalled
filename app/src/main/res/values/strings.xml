@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">WechatUnrecalled</string>
+    <string name="title_activity_main" translatable="false">MainActivity</string>
+    <string name="disable_notification">Disable notification</string>
+    <string name="show_content">Show recalled content (only text)</string>
+    <string name="hide_icon">Hide launcher icon</string>
+    <string name="show_icon">Show launcher icon</string>
 </resources>
