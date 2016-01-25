@@ -31,6 +31,9 @@ public class WechatPackageNames {
 
         initNames();
         switch (version) {
+            case "6.3.11":
+                set6311();
+                break;
             case "6.3.9":
                 set639();
                 break;
@@ -72,7 +75,7 @@ public class WechatPackageNames {
         snsClass += "h.l";
         snsMethod += "g.d";
         dbClass1 += "ai";
-        dbMethod1 = "t0";
+        dbMethod1 = "tO";
         dbMethod2 = "rM";
         dbField = "bts";
         updateMsgId = "aPy";
@@ -127,6 +130,22 @@ public class WechatPackageNames {
         avatarClass += ".q.n";
         avatarMethod1 = "vi";
         avatarMethod2 = "b";
+    }
+
+
+    private void set6311() {
+        set639();
+        dbClass1 += "ah";
+        dbMethod1 = "tD";
+        dbMethod2 = "rs";
+        dbField = "bCw";// look for: ah.tD().rs() or in com.tencent.mm.storage.ah
+        updateMsgId = "aXP";
+        iconClass = this.packageName + ".aq.a";
+        iconMethod = "aOQ";
+        imageClass = this.packageName + ".ab.n";
+        imageMethod1 = "Ao";
+        imageMethod2 = "hM";
+        avatarMethod1 = "vu";
     }
 
     private void initNames() {

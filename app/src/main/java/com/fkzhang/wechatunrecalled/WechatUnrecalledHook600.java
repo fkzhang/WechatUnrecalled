@@ -83,10 +83,9 @@ public class WechatUnrecalledHook600 extends WechatUnrecalledHook {
                 });
     }
 
-    protected void insertMessage(String talker, String msg) {
+    protected void insertMessage(String talker, String msg, long createTime) {
         int type = 10000;
         int status = 3;
-        long createTime = System.currentTimeMillis();
         long msgSvrId = createTime + (new Random().nextInt());
         long msgId = getNextMsgId();
         ContentValues v = new ContentValues();

@@ -1,8 +1,17 @@
 <resources>
     <string name="app_name">WechatUnrecalled</string>
     <string name="title_activity_main" translatable="false">MainActivity</string>
-    <string name="disable_notification">Disable notification</string>
+    <string name="enable_notification">Enable message recall notification</string>
     <string name="show_content">Show recalled content (only text)</string>
     <string name="hide_icon">Hide launcher icon</string>
     <string name="show_icon">Show launcher icon</string>
+    <string name="recalled_img_summary">View in full screen mode</string>
+    <string name="recalled_video_summary">[Video] View in full screen mode</string>
+    <string name="recalled_message">recalled message</string>
+    <string name="recalled_msg_content">(Prevented)</string>
+    <string name="comment_recalled_message">comment recalled message</string>
+    <string name="comment_recall_content">tried to delete a comment</string>
+    <string name="enable_comment_recall_notification">Enable comment recall notification</string>
+    <string name="new_comment">New comment</string>
+    <string name="enable_new_comment_notification">Enable new comment notification</string>
 </resources>

@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -44,11 +45,14 @@ public class WechatUnrecalledHook {
     protected Class<?> mImgClss;
     protected boolean mAvatarInit;
     protected Class<?> mAvatarLoader;
-    private boolean isChinese = true;
+    protected HashMap<String, Bitmap> mAvatarCache;
+    protected HashMap<String, String> mNicknameCache;
 
     public WechatUnrecalledHook(WechatPackageNames packageNames) {
         this.mP = packageNames;
         mSettings = new SettingsHelper("com.fkzhang.wechatunrecalled");
+        mAvatarCache = new HashMap<>();
+        mNicknameCache = new HashMap<>();
     }
 
     public void hook(ClassLoader loader) {
@@ -67,6 +71,21 @@ public class WechatUnrecalledHook {
         } catch (Throwable e) {
             XposedBridge.log(e);
         }
+        try {
+            hookLauncherUI(loader);
+        } catch (Throwable e) {
+            XposedBridge.log(e);
+        }
+    }
+
+    protected void hookLauncherUI(ClassLoader loader) {
+        XposedHelpers.findAndHookMethod(mP.packageName + ".ui.LauncherUI", loader, "onResume",
+                new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        mSettings.reload();
+                    }
+                });
     }
 
     protected void hookRecall(final ClassLoader loader) {
@@ -103,7 +122,6 @@ public class WechatUnrecalledHook {
         mSQLDB = getObjectField(mObject, mP.dbField);
 
         // look for: field_imgPath in pluginsdk/model/app
-        // .startsWith("THUMBNAIL_DIRPATH://")
         mImgClss = findClass(mP.imageClass, loader);
     }
 
@@ -119,6 +137,27 @@ public class WechatUnrecalledHook {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         preventCommentRecall(param);
+                    }
+                });
+        findAndHookMethod(mP.packageNameBase + ".kingkong.database.SQLiteDatabase", loader,
+                "insertWithOnConflict", String.class, String.class, ContentValues.class, int.class,
+                new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        super.afterHookedMethod(param);
+                        if (!mSettings.getBoolean("enable_new_comment_notification", false))
+                            return;
+
+                        String s = ((String) param.args[0]).toLowerCase();
+                        if (!s.equalsIgnoreCase("snscomment"))
+                            return;
+
+                        ContentValues v = (ContentValues) param.args[2];
+                        String talker = (String) v.get("talker");
+                        Bitmap icon = getAccountAvatar(talker);
+                        String name = getNickname(talker);
+                        String content = mSettings.getString("new_comment", "New comment");
+                        showTextNotification(name, content, icon);
                     }
                 });
     }
@@ -144,17 +183,17 @@ public class WechatUnrecalledHook {
         String replacemsg = map.get(".sysmsg.revokemsg.replacemsg");
         String msgsvrid = map.get(".sysmsg.revokemsg.newmsgid");
         if (replacemsg.contains("撤回")) {
-            replacemsg = replacemsg.replaceAll("撤回了", "尝试撤回") + " (已阻止)";
+            replacemsg = replacemsg.replaceAll("撤回了", "尝试撤回");
         } else {
-            replacemsg = replacemsg.replaceAll("recalled", "tried to recall") + " (Prevented)";
-            isChinese = false;
+            replacemsg = replacemsg.replaceAll("recalled", "tried to recall");
         }
+        replacemsg += " " + mSettings.getString("recalled", "(Prevented)");
 
-        if (!mSettings.getBoolean("disable_notification", false)) {
-            Cursor cursor = getMessage(msgsvrid);
-            if (cursor == null || !cursor.moveToFirst())
-                return;
+        Cursor cursor = getMessage(msgsvrid);
+        if (cursor == null || !cursor.moveToFirst())
+            return;
 
+        if (mSettings.getBoolean("enable_recall_notification", true)) {
             String content = cursor.getString(cursor.getColumnIndex("content"));
             Bitmap icon = getAccountAvatar(talker);
             int t = cursor.getInt(cursor.getColumnIndex("type"));
@@ -162,11 +201,8 @@ public class WechatUnrecalledHook {
                 case 1: // text
                     showTextNotification(replacemsg, content, icon);
                     if (mSettings.getBoolean("show_content", false)) {
-                        if (isChinese) {
-                            replacemsg = content + " (已阻止撤回)";
-                        } else {
-                            replacemsg = content + " (Recall prevented)";
-                        }
+                        replacemsg = content + " " + mSettings.getString("recalled",
+                                "(Recall prevented)");
                     }
                     break;
                 case 3: // image
@@ -176,12 +212,8 @@ public class WechatUnrecalledHook {
                         Intent intent = new Intent();
                         intent.putExtra("img_gallery_talker", talker);
                         intent.putExtra("img_gallery_msg_svr_id", Long.parseLong(msgsvrid));
-                        String summary;
-                        if (isChinese) {
-                            summary = "点击查看";
-                        } else {
-                            summary = "View in full screen mode";
-                        }
+                        String summary = mSettings.getString("recalled_img_summary",
+                                "View in full screen mode");
                         showImageNotification(replacemsg, bitmap, intent, summary, icon);
                     }
                     break;
@@ -189,19 +221,16 @@ public class WechatUnrecalledHook {
                     Intent intent = new Intent();
                     intent.putExtra("img_gallery_talker", talker);
                     intent.putExtra("img_gallery_msg_svr_id", Long.parseLong(msgsvrid));
-                    String summary;
-                    if (isChinese) {
-                        summary = "[小视频] 点击查看";
-                    } else {
-                        summary = "[Video] View in full screen mode";
-                    }
-                    showVideoNotification(replacemsg, summary, intent, icon);
+                    String summary = mSettings.getString("recalled_video_summary",
+                            "[Video] View in full screen mode");
+                    showImageNotification(replacemsg, null, intent, summary, icon);
                     break;
             }
-            cursor.close();
         }
 
-        insertMessage(talker, replacemsg);
+        long createTime = cursor.getLong(cursor.getColumnIndex("createTime"));
+        insertMessage(talker, replacemsg, createTime + 1);
+        cursor.close();
     }
 
     protected void unRecallSnsComments(Object SQL) {
@@ -229,38 +258,26 @@ public class WechatUnrecalledHook {
         ContentValues v = (ContentValues) param.args[1];
         if (v.containsKey("commentflag") && v.getAsInteger("commentflag") == 1) {
             param.setResult(null); // prevent call
-            if (mSettings.getBoolean("disable_notification", false))
+            if (!mSettings.getBoolean("enable_comment_recall_notification", true))
                 return;
 
             String talker = v.getAsString("talker");
             Bitmap icon = getAccountAvatar(talker);
-            Cursor cursor = getContact(talker);
-            String name = talker;
-            if (cursor != null && cursor.moveToFirst()) {
-                name = cursor.getString(cursor.getColumnIndex("conRemark"));
-                if (TextUtils.isEmpty(name)) {
-                    name = cursor.getString(cursor.getColumnIndex("nickname"));
-                }
-            }
-            String content;
-            if (isChinese) {
-                content = "尝试删除一条评论";
-            } else {
-                content = "tried to delete a comment";
-            }
-            showTextNotification(name, content, icon);
+            String name = getNickname(talker);
 
+            String content = mSettings.getString("comment_recall_content",
+                    "tried to delete a comment");
+            showTextNotification(name, content, icon);
         }
     }
 
-    protected void insertMessage(String talker, String msg) {
+    protected void insertMessage(String talker, String msg, long createTime) {
         int contactId = getTalkerId(talker);
         if (contactId == -1)
             return;
 
         int type = 10000;
         int status = 3;
-        long createTime = System.currentTimeMillis();
         long msgSvrId = createTime + (new Random().nextInt());
         long msgId = getNextMsgId();
         ContentValues v = new ContentValues();
@@ -335,20 +352,6 @@ public class WechatUnrecalledHook {
 
         Intent resultIntent = new Intent();
         resultIntent.setClassName(mNotificationContext.getPackageName(), mNotificationClass.getName());
-
-        showNotification(builder, resultIntent);
-    }
-
-    protected void showVideoNotification(String title, String content, Intent resultIntent, Bitmap icon) {
-        Notification.Builder builder = new Notification.Builder(mNotificationContext)
-                .setLargeIcon(icon)
-                .setSmallIcon(mNotificationIcon)
-                .setContentTitle(title)
-                .setContentText(content)
-                .setAutoCancel(true);
-
-        resultIntent.setClassName(mNotificationContext.getPackageName(),
-                mP.packageName + ".ui.chatting.gallery.ImageGalleryUI");
 
         showNotification(builder, resultIntent);
     }
@@ -428,6 +431,9 @@ public class WechatUnrecalledHook {
     }
 
     protected Bitmap getAccountAvatar(String accountName) {
+        if (mAvatarCache.containsKey(accountName)) {
+            return mAvatarCache.get(accountName);
+        }
         if (mAvatarLoader == null)
             return null;
 
@@ -435,6 +441,9 @@ public class WechatUnrecalledHook {
         try {
             avatar = (Bitmap) callMethod(callStaticMethod(mAvatarLoader, mP.avatarMethod1),
                     mP.avatarMethod2, accountName, false, -1);
+            if (avatar != null) {
+                mAvatarCache.put(accountName, avatar);
+            }
         } catch (Throwable t) {
 //            XposedBridge.log(t);
         }
@@ -452,5 +461,23 @@ public class WechatUnrecalledHook {
         initDatabase(loader);
         initNotification(loader);
         initAvatarLoader(loader);
+    }
+
+    protected String getNickname(String username) {
+        if (mNicknameCache.containsKey(username)) {
+            return mNicknameCache.get(username);
+        }
+
+        Cursor cursor = getContact(username);
+        if (cursor != null && cursor.moveToFirst()) {
+            String name = cursor.getString(cursor.getColumnIndex("conRemark"));
+            if (TextUtils.isEmpty(name)) {
+                name = cursor.getString(cursor.getColumnIndex("nickname"));
+            }
+            cursor.close();
+            mNicknameCache.put(username, name);
+            return name;
+        }
+        return username;
     }
 }

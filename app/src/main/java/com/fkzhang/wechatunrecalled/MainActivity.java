@@ -5,9 +5,13 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Switch;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,14 +27,32 @@ public class MainActivity extends AppCompatActivity {
 
         final SettingsHelper settingsHelper = new SettingsHelper(this, "com.fkzhang.wechatunrecalled");
 
-        Switch disable_notification = (Switch) findViewById(R.id.disable_notification);
-        disable_notification.setChecked(settingsHelper.getBoolean("disable_notification", false));
-        disable_notification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        Switch enable_recall_notification = (Switch) findViewById(R.id.enable_recall_notification);
+        enable_recall_notification.setChecked(settingsHelper.getBoolean("enable_recall_notification", true));
+        enable_recall_notification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                settingsHelper.setBoolean("disable_notification", isChecked);
+                settingsHelper.setBoolean("enable_recall_notification", isChecked);
             }
         });
+
+        Switch enable_comment_recall_notification = (Switch) findViewById(R.id.enable_comment_recall_notification);
+        enable_comment_recall_notification.setChecked(settingsHelper.getBoolean("enable_comment_recall_notification", true));
+        enable_comment_recall_notification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                settingsHelper.setBoolean("enable_comment_recall_notification", isChecked);
+            }
+        });
+        Switch enable_new_comment_notification = (Switch) findViewById(R.id.enable_new_comment_notification);
+        enable_new_comment_notification.setChecked(settingsHelper.getBoolean("enable_new_comment_notification", false));
+        enable_new_comment_notification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                settingsHelper.setBoolean("enable_new_comment_notification", isChecked);
+            }
+        });
+
         Switch show_content = (Switch) findViewById(R.id.show_content);
         show_content.setChecked(settingsHelper.getBoolean("show_content", false));
         show_content.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -39,6 +61,55 @@ public class MainActivity extends AppCompatActivity {
                 settingsHelper.setBoolean("show_content", isChecked);
             }
         });
+
+        EditText recalled_message = (EditText) findViewById(R.id.editText);
+        if (TextUtils.isEmpty(settingsHelper.getString("recalled", null))) {
+            settingsHelper.setString("recalled", getString(R.string.recalled_msg_content));
+        }
+        recalled_message.setText(settingsHelper.getString("recalled", "(Prevented)"));
+        recalled_message.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                settingsHelper.setString("recalled", s.toString());
+            }
+        });
+
+        EditText comment_recalled_message = (EditText) findViewById(R.id.editText2);
+        if (TextUtils.isEmpty(settingsHelper.getString("comment_recall_content", null))) {
+            settingsHelper.setString("comment_recall_content",
+                    getString(R.string.comment_recall_content));
+        }
+        comment_recalled_message.setText(settingsHelper.getString("comment_recall_content",
+                getString(R.string.comment_recall_content)));
+        comment_recalled_message.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                settingsHelper.setString("comment_recall_content", s.toString());
+            }
+        });
+
+        settingsHelper.setString("recalled_img_summary", getString(R.string.recalled_img_summary));
+        settingsHelper.setString("recalled_video_summary", getString(R.string.recalled_video_summary));
 
     }
 

@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">WechatUnrecalled</string>
-    <string name="disable_notification">关闭通知</string>
     <string name="show_content">显示已撤回内容(只支持文字)</string>
     <string name="show_icon">显示图标</string>
     <string name="hide_icon">隐藏图标</string>
+    <string name="recalled_video_summary">[小视频] 点击查看</string>
+    <string name="recalled_img_summary">图片点击查看</string>
+    <string name="recalled_message">撤回消息</string>
+    <string name="recalled_msg_content">(已阻止)</string>
+    <string name="comment_recall_content">尝试删除一条评论</string>
+    <string name="comment_recalled_message">评论删除消息</string>
+    <string name="enable_notification">开启消息撤回通知</string>
+    <string name="enable_comment_recall_notification">开启评论删除通知</string>
+    <string name="new_comment">新评论</string>
+    <string name="enable_new_comment_notification">开启新评论通知</string>
 </resources>
