@@ -71,21 +71,6 @@ public class WechatUnrecalledHook {
         } catch (Throwable e) {
             XposedBridge.log(e);
         }
-        try {
-            hookLauncherUI(loader);
-        } catch (Throwable e) {
-            XposedBridge.log(e);
-        }
-    }
-
-    protected void hookLauncherUI(ClassLoader loader) {
-        XposedHelpers.findAndHookMethod(mP.packageName + ".ui.LauncherUI", loader, "onResume",
-                new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        mSettings.reload();
-                    }
-                });
     }
 
     protected void hookRecall(final ClassLoader loader) {
@@ -187,6 +172,7 @@ public class WechatUnrecalledHook {
         } else {
             replacemsg = replacemsg.replaceAll("recalled", "tried to recall");
         }
+        mSettings.reload();
         replacemsg += " " + mSettings.getString("recalled", "(Prevented)");
 
         Cursor cursor = getMessage(msgsvrid);
@@ -265,6 +251,7 @@ public class WechatUnrecalledHook {
             Bitmap icon = getAccountAvatar(talker);
             String name = getNickname(talker);
 
+            mSettings.reload();
             String content = mSettings.getString("comment_recall_content",
                     "tried to delete a comment");
             showTextNotification(name, content, icon);
@@ -297,7 +284,9 @@ public class WechatUnrecalledHook {
         Cursor cursor = rawQuery("SELECT max(msgId) FROM message");
         if (cursor == null || !cursor.moveToFirst())
             return -1;
-        return cursor.getInt(0) + 1;
+        int id = cursor.getInt(0) + 1;
+        cursor.close();
+        return id;
     }
 
     protected int getTalkerId(String talker) {
