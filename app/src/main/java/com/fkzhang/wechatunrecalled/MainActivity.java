@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
         settingsHelper.setString("recalled_img_summary", getString(R.string.recalled_img_summary));
         settingsHelper.setString("recalled_video_summary", getString(R.string.recalled_video_summary));
+        settingsHelper.setString("new_comment", getString(R.string.new_comment));
 
     }
 
