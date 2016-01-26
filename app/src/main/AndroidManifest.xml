@@ -16,7 +16,7 @@
             android:value="Prevent Wechat from recalling chat messages and sns (moments) comments. (防止微信撤回聊天消息和朋友圈回复)" />
         <meta-data
             android:name="xposedminversion"
-            android:value="54" />
+            android:value="46" />
 
         <activity
             android:name=".MainActivity"

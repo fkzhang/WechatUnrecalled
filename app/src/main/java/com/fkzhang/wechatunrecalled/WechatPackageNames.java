@@ -135,7 +135,6 @@ public class WechatPackageNames {
 
     private void set6311() {
         set639();
-        dbClass1 += "ah";
         dbMethod1 = "tD";
         dbMethod2 = "rs";
         dbField = "bCw";// look for: ah.tD().rs() or in com.tencent.mm.storage.ah

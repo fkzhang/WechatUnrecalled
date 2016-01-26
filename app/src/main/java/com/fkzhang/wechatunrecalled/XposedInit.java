@@ -82,7 +82,7 @@ public class XposedInit implements IXposedHookLoadPackage {
                 }
                 break;
             default:
-                XposedBridge.log("wechat version not supported, please upgrade");
+                XposedBridge.log("wechat version " + version + " not supported, please upgrade");
                 return null;
         }
 
