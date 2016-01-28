@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "com.fkzhang.wechatunrecalled"
-        minSdkVersion 16
+        minSdkVersion 14
         targetSdkVersion 23
-        versionCode 5
-        versionName "1.3"
+        versionCode 6
+        versionName "1.3.1"
     }
     buildTypes {
         release {

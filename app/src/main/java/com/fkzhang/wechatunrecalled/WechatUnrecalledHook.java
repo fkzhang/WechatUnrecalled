@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 
@@ -183,6 +184,12 @@ public class WechatUnrecalledHook {
 
         if (mSettings.getBoolean("enable_recall_notification", true)) {
             String content = cursor.getString(cursor.getColumnIndex("content")).trim();
+            if (talker.contains("@chatroom")) {
+                int idx = content.indexOf(":");
+                if (idx != -1) {
+                    content = content.substring(idx + 1, content.length()).trim();
+                }
+            }
             Bitmap icon = getAccountAvatar(talker);
             int t = cursor.getInt(cursor.getColumnIndex("type"));
             switch (t) {
@@ -330,7 +337,7 @@ public class WechatUnrecalledHook {
     }
 
     protected void showTextNotification(String title, String content, Bitmap icon) {
-        Notification.Builder builder = new Notification.Builder(mNotificationContext)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mNotificationContext)
                 .setLargeIcon(icon)
                 .setSmallIcon(mNotificationIcon)
                 .setContentTitle(title)
@@ -350,7 +357,7 @@ public class WechatUnrecalledHook {
         if (TextUtils.isEmpty(content))
             return;
 
-        Notification.Builder builder = new Notification.Builder(mNotificationContext)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mNotificationContext)
                 .setLargeIcon(icon)
                 .setSmallIcon(mNotificationIcon)
                 .setContentTitle(title)
@@ -366,14 +373,15 @@ public class WechatUnrecalledHook {
 
     protected void showImageNotification(String title, Bitmap bitmap, Intent resultIntent,
                                          String summary, Bitmap icon) {
-        Notification.Builder builder = new Notification.Builder(mNotificationContext)
-                .setLargeIcon(icon)
-                .setSmallIcon(mNotificationIcon)
-                .setContentTitle(title)
-                .setAutoCancel(true);
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(mNotificationContext)
+                        .setLargeIcon(icon)
+                        .setSmallIcon(mNotificationIcon)
+                        .setContentTitle(title)
+                        .setAutoCancel(true);
 
         if (bitmap != null) {
-            builder.setStyle(new Notification.BigPictureStyle()
+            builder.setStyle(new NotificationCompat.BigPictureStyle()
                     .bigPicture(bitmap).setSummaryText(summary));
         } else {
             builder.setContentText(summary);
@@ -385,7 +393,7 @@ public class WechatUnrecalledHook {
         showNotification(builder, resultIntent);
     }
 
-    protected void showNotification(Notification.Builder builder, Intent intent) {
+    protected void showNotification(NotificationCompat.Builder builder, Intent intent) {
         TaskStackBuilder stackBuilder;
         stackBuilder = TaskStackBuilder.create(mNotificationContext);
         stackBuilder.addParentStack(mNotificationClass);
