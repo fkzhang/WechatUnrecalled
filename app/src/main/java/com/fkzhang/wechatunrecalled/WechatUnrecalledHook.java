@@ -189,8 +189,7 @@ public class WechatUnrecalledHook {
                 case 1: // text
                     showTextNotification(replacemsg, content, icon);
                     if (mSettings.getBoolean("show_content", false)) {
-                        replacemsg = content + " " + mSettings.getString("recalled",
-                                "(Recall prevented)");
+                        replacemsg += ": " + content;
                     }
                     break;
                 case 3: // image
