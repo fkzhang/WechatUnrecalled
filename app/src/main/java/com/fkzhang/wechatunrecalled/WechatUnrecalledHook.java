@@ -47,6 +47,7 @@ public class WechatUnrecalledHook {
     protected Class<?> mAvatarLoader;
     protected HashMap<String, Bitmap> mAvatarCache;
     protected HashMap<String, String> mNicknameCache;
+    protected Class<?> mCommentClass;
 
     public WechatUnrecalledHook(WechatPackageNames packageNames) {
         this.mP = packageNames;
@@ -130,6 +131,7 @@ public class WechatUnrecalledHook {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                         super.afterHookedMethod(param);
+                        mSettings.reload();
                         if (!mSettings.getBoolean("enable_new_comment_notification", false))
                             return;
 
@@ -140,9 +142,9 @@ public class WechatUnrecalledHook {
                         ContentValues v = (ContentValues) param.args[2];
                         String talker = (String) v.get("talker");
                         Bitmap icon = getAccountAvatar(talker);
-                        String name = getNickname(talker);
-                        String content = mSettings.getString("new_comment", "New comment");
-                        showTextNotification(name, content, icon);
+                        String name = getNickname(talker) + " " + mSettings.getString("new_comment", "(New comment)");
+                        String content = getCommentContent(v.getAsByteArray("curActionBuf"));
+                        showCommentNotification(name, content, icon);
                     }
                 });
     }
@@ -180,7 +182,7 @@ public class WechatUnrecalledHook {
             return;
 
         if (mSettings.getBoolean("enable_recall_notification", true)) {
-            String content = cursor.getString(cursor.getColumnIndex("content"));
+            String content = cursor.getString(cursor.getColumnIndex("content")).trim();
             Bitmap icon = getAccountAvatar(talker);
             int t = cursor.getInt(cursor.getColumnIndex("type"));
             switch (t) {
@@ -215,8 +217,8 @@ public class WechatUnrecalledHook {
         }
 
         long createTime = cursor.getLong(cursor.getColumnIndex("createTime"));
-        insertMessage(talker, replacemsg, createTime + 1);
         cursor.close();
+        insertMessage(talker, replacemsg, createTime + 1);
     }
 
     protected void unRecallSnsComments(Object SQL) {
@@ -240,6 +242,7 @@ public class WechatUnrecalledHook {
         String table = (String) param.args[0];
         if (!table.equalsIgnoreCase("snscomment"))
             return;
+        mSettings.reload();
 
         ContentValues v = (ContentValues) param.args[1];
         if (v.containsKey("commentflag") && v.getAsInteger("commentflag") == 1) {
@@ -249,12 +252,11 @@ public class WechatUnrecalledHook {
 
             String talker = v.getAsString("talker");
             Bitmap icon = getAccountAvatar(talker);
-            String name = getNickname(talker);
+            String name = getNickname(talker) + " " +
+                    mSettings.getString("comment_recall_content", "comment_recall_content");
+            String content = getCommentContent(v.getAsByteArray("curActionBuf"));
 
-            mSettings.reload();
-            String content = mSettings.getString("comment_recall_content",
-                    "tried to delete a comment");
-            showTextNotification(name, content, icon);
+            showCommentNotification(name, content, icon);
         }
     }
 
@@ -345,6 +347,24 @@ public class WechatUnrecalledHook {
         showNotification(builder, resultIntent);
     }
 
+    protected void showCommentNotification(String title, String content, Bitmap icon) {
+        if (TextUtils.isEmpty(content))
+            return;
+
+        Notification.Builder builder = new Notification.Builder(mNotificationContext)
+                .setLargeIcon(icon)
+                .setSmallIcon(mNotificationIcon)
+                .setContentTitle(title)
+                .setAutoCancel(true)
+                .setContentText(content);
+
+        Intent resultIntent = new Intent();
+        resultIntent.setClassName(mNotificationContext.getPackageName(),
+                mP.packageName + ".plugin.sns.ui.SnsMsgUI");
+
+        showNotification(builder, resultIntent);
+    }
+
     protected void showImageNotification(String title, Bitmap bitmap, Intent resultIntent,
                                          String summary, Bitmap icon) {
         Notification.Builder builder = new Notification.Builder(mNotificationContext)
@@ -356,6 +376,8 @@ public class WechatUnrecalledHook {
         if (bitmap != null) {
             builder.setStyle(new Notification.BigPictureStyle()
                     .bigPicture(bitmap).setSummaryText(summary));
+        } else {
+            builder.setContentText(summary);
         }
 
         resultIntent.setClassName(mNotificationContext.getPackageName(),
@@ -401,6 +423,8 @@ public class WechatUnrecalledHook {
                 findClass(mP.iconClass, loader), mP.iconMethod);
         mNotificationLargeIcon = BitmapFactory.decodeResource(mNotificationContext
                 .getResources(), mNotificationContext.getApplicationInfo().icon);
+        // look for: curActionBuf
+        mCommentClass = findClass(mP.commentClass, loader);
     }
 
     protected Bitmap getImage(String path) {
@@ -434,7 +458,7 @@ public class WechatUnrecalledHook {
                 mAvatarCache.put(accountName, avatar);
             }
         } catch (Throwable t) {
-//            XposedBridge.log(t);
+            XposedBridge.log(t);
         }
         if (avatar == null) {
             avatar = mNotificationLargeIcon;
@@ -458,15 +482,22 @@ public class WechatUnrecalledHook {
         }
 
         Cursor cursor = getContact(username);
-        if (cursor != null && cursor.moveToFirst()) {
-            String name = cursor.getString(cursor.getColumnIndex("conRemark"));
-            if (TextUtils.isEmpty(name)) {
-                name = cursor.getString(cursor.getColumnIndex("nickname"));
-            }
-            cursor.close();
-            mNicknameCache.put(username, name);
-            return name;
+        if (cursor == null || !cursor.moveToFirst())
+            return username;
+
+        String name = cursor.getString(cursor.getColumnIndex("conRemark"));
+        if (TextUtils.isEmpty(name)) {
+            name = cursor.getString(cursor.getColumnIndex("nickname"));
         }
-        return username;
+        cursor.close();
+        mNicknameCache.put(username, name);
+        return name;
+    }
+
+
+    public String getCommentContent(byte[] blob) {
+        Object o = callMethod(XposedHelpers.newInstance(mCommentClass), mP.commentMethod,
+                new Class[]{byte[].class}, blob);
+        return (String) getObjectField(o, mP.commentField);
     }
 }

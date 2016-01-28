@@ -80,6 +80,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                String t = s.toString().trim();
+                if (TextUtils.isEmpty(t))
+                    return;
+
                 settingsHelper.setString("recalled", s.toString());
             }
         });
@@ -104,6 +108,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                String t = s.toString().trim();
+                if (TextUtils.isEmpty(t))
+                    return;
+
                 settingsHelper.setString("comment_recall_content", s.toString());
             }
         });

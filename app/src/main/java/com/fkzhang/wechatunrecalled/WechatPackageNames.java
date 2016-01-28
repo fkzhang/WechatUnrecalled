@@ -24,6 +24,9 @@ public class WechatPackageNames {
     public String avatarClass;
     public String avatarMethod1;
     public String avatarMethod2;
+    public String commentMethod;
+    public String commentField;
+    public String commentClass;
 
     public WechatPackageNames(String packageName, String version) {
         this.packageName = packageName;
@@ -67,6 +70,9 @@ public class WechatPackageNames {
         avatarClass += ".p.af";
         avatarMethod1 = "uQ";
         avatarMethod2 = "b";
+        commentClass += "aaq";
+        commentMethod = "m";
+        commentField = "fWd";
     }
 
     private void set635() {
@@ -88,6 +94,9 @@ public class WechatPackageNames {
         avatarClass += ".p.n";
         avatarMethod1 = "vI";
         avatarMethod2 = "b";
+        commentClass += "alx";
+        commentMethod = "ak";
+        commentField = "eNp";
     }
 
     private void set638() {
@@ -109,6 +118,9 @@ public class WechatPackageNames {
         avatarClass += ".p.n";
         avatarMethod1 = "vF";
         avatarMethod2 = "b";
+        commentClass += "aoq";
+        commentMethod = "ak";
+        commentField = "fdy";
     }
 
     private void set639() {
@@ -130,21 +142,34 @@ public class WechatPackageNames {
         avatarClass += ".q.n";
         avatarMethod1 = "vi";
         avatarMethod2 = "b";
+        commentClass += "api";
+        commentMethod = "al";
+        commentField = "fmw";
     }
 
 
     private void set6311() {
-        set639();
+        recallClass += "q";
+        recallMethod = "J";
+        snsClass += "h.l";
+        snsMethod += "h.d";
+        dbClass1 += "ah";
         dbMethod1 = "tD";
         dbMethod2 = "rs";
         dbField = "bCw";// look for: ah.tD().rs() or in com.tencent.mm.storage.ah
         updateMsgId = "aXP";
-        iconClass = this.packageName + ".aq.a";
+        contextGetter += "y";
+        iconClass += ".aq.a";
         iconMethod = "aOQ";
-        imageClass = this.packageName + ".ab.n";
+        imageClass += ".ab.n";
         imageMethod1 = "Ao";
         imageMethod2 = "hM";
+        avatarClass += ".q.n";
+        avatarMethod1 = "vi";
         avatarMethod1 = "vu";
+        commentClass += "apu";
+        commentMethod = "am";
+        commentField = "fsI";
     }
 
     private void initNames() {
@@ -166,5 +191,8 @@ public class WechatPackageNames {
         avatarClass = this.packageName;
         avatarMethod1 = "";
         avatarMethod2 = "";
+        commentClass = this.packageName + ".protocal.b.";
+        commentMethod = "";
+        commentField = "";
     }
 }

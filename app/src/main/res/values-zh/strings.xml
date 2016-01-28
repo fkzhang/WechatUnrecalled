@@ -12,6 +12,6 @@
     <string name="comment_recalled_message">评论删除消息</string>
     <string name="enable_notification">开启消息撤回通知</string>
     <string name="enable_comment_recall_notification">开启评论删除通知</string>
-    <string name="new_comment">新评论</string>
+    <string name="new_comment">(新评论)</string>
     <string name="enable_new_comment_notification">开启新评论通知</string>
 </resources>

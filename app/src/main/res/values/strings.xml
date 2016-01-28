@@ -12,6 +12,6 @@
     <string name="comment_recalled_message">comment recalled message</string>
     <string name="comment_recall_content">tried to delete a comment</string>
     <string name="enable_comment_recall_notification">Enable comment recall notification</string>
-    <string name="new_comment">New comment</string>
+    <string name="new_comment">(New comment)</string>
     <string name="enable_new_comment_notification">Enable new comment notification</string>
 </resources>
