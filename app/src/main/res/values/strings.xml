@@ -14,4 +14,5 @@
     <string name="enable_comment_recall_notification">Enable comment recall notification</string>
     <string name="new_comment">(New comment)</string>
     <string name="enable_new_comment_notification">Enable new comment notification</string>
+    <string name="deleted">[Deleted]</string>
 </resources>

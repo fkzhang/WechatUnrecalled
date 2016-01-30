@@ -24,9 +24,15 @@ public class WechatPackageNames {
     public String avatarClass;
     public String avatarMethod1;
     public String avatarMethod2;
-    public String commentMethod;
-    public String commentField;
+    public String blobDecodeMethod;
+    public String commentContentField;
     public String commentClass;
+    public String commentTimeField;
+    public String snsContentClass;
+    public String snsContentField;
+    public String luckyRevealImageView;
+    public String snsAttrClass;
+    public String snsAttrField;
 
     public WechatPackageNames(String packageName, String version) {
         this.packageName = packageName;
@@ -45,6 +51,12 @@ public class WechatPackageNames {
                 break;
             case "6.3.5":
                 set635();
+                break;
+            case "6.3.0":
+                set630();
+                break;
+            case "6.2.5":
+                set625();
                 break;
             case "6.0.0":
                 set600();
@@ -71,8 +83,71 @@ public class WechatPackageNames {
         avatarMethod1 = "uQ";
         avatarMethod2 = "b";
         commentClass += "aaq";
-        commentMethod = "m";
-        commentField = "fWd";
+        blobDecodeMethod = "m";
+        commentContentField = "fWd";
+        snsContentClass += "adq";
+        snsContentField = "iZr";
+        snsAttrClass += "abb";
+        snsAttrField = "iWH";
+        commentTimeField = "iuc";
+    }
+
+    private void set625() {
+        recallClass += "p";
+        recallMethod = "B";
+        snsClass += "g.l";
+        snsMethod += "g.d";
+        dbClass1 += "ah";
+        dbMethod1 = "tI";
+        dbMethod2 = "rG";
+        dbField = "bvg";
+        updateMsgId = "aNG";
+        contextGetter += "x";
+        iconClass += ".am.a";
+        iconMethod = "aDA";
+        imageClass += ".z.n";
+        imageMethod1 = "Ao";
+        imageMethod2 = "hs";
+        avatarClass += ".p.n";
+        avatarMethod1 = "vC";
+        avatarMethod2 = "b";
+        commentClass += "alf";
+        blobDecodeMethod = "ag";
+        commentContentField = "eGr";
+        snsContentClass += "aok";
+        snsContentField = "ixy";
+        snsAttrClass += "alr";
+        snsAttrField = "ivq";
+        commentTimeField = "eDv";
+    }
+
+    private void set630() {
+        recallClass += "q";
+        recallMethod = "C";
+        snsClass += "h.l";
+        snsMethod += "g.d";
+        dbClass1 += "ah";
+        dbMethod1 = "tL";
+        dbMethod2 = "rJ";
+        dbField = "bts";
+        updateMsgId = "aPp";
+        contextGetter += "y";
+        iconClass += ".an.a";
+        iconMethod = "aFK";
+        imageClass += ".z.n";
+        imageMethod1 = "Ar";
+        imageMethod2 = "hv";
+        avatarClass += ".p.n";
+        avatarMethod1 = "vF";
+        avatarMethod2 = "b";
+        commentClass += "alx";
+        blobDecodeMethod = "aj";
+        commentContentField = "eNl";
+        snsContentClass += "apb";
+        snsContentField = "iIM";
+        snsAttrClass += "amj";
+        snsAttrField = "iGA";
+        commentTimeField = "eKp";
     }
 
     private void set635() {
@@ -95,8 +170,13 @@ public class WechatPackageNames {
         avatarMethod1 = "vI";
         avatarMethod2 = "b";
         commentClass += "alx";
-        commentMethod = "ak";
-        commentField = "eNp";
+        blobDecodeMethod = "ak";
+        commentContentField = "eNp";
+        snsContentClass += "apb";
+        snsContentField = "iIO";
+        snsAttrClass += "amj";
+        snsAttrField = "iGC";
+        commentTimeField = "eKt";
     }
 
     private void set638() {
@@ -116,11 +196,16 @@ public class WechatPackageNames {
         imageMethod1 = "zV";
         imageMethod2 = "hC";
         avatarClass += ".p.n";
-        avatarMethod1 = "vF";
+        avatarMethod1 = "vf";
         avatarMethod2 = "b";
         commentClass += "aoq";
-        commentMethod = "ak";
-        commentField = "fdy";
+        blobDecodeMethod = "ak";
+        commentContentField = "fdy";
+        snsContentClass += "asd";
+        snsContentField = "jjP";
+        snsAttrClass += "apc";
+        snsAttrField = "jhw";
+        commentTimeField = "faB";
     }
 
     private void set639() {
@@ -143,8 +228,15 @@ public class WechatPackageNames {
         avatarMethod1 = "vi";
         avatarMethod2 = "b";
         commentClass += "api";
-        commentMethod = "al";
-        commentField = "fmw";
+        blobDecodeMethod = "al";
+        commentContentField = "fmw";
+        snsContentClass += "asz";
+        snsContentField = "jBA";
+        snsAttrClass += "apw";
+        snsAttrField = "jzc";
+        commentTimeField = "fjz";
+        luckyRevealImageView = this.packageName +
+                ".plugin.sns.lucky.ui.LuckyRevealImageView";
     }
 
 
@@ -165,11 +257,18 @@ public class WechatPackageNames {
         imageMethod1 = "Ao";
         imageMethod2 = "hM";
         avatarClass += ".q.n";
-        avatarMethod1 = "vi";
         avatarMethod1 = "vu";
+        avatarMethod2 = "b";
         commentClass += "apu";
-        commentMethod = "am";
-        commentField = "fsI";
+        blobDecodeMethod = "am";
+        commentContentField = "fsI";
+        snsContentClass += "atp";
+        snsContentField = "jMu";
+        snsAttrClass += "aqi";
+        snsAttrField = "jJX";
+        commentTimeField = "fpL";
+        luckyRevealImageView = this.packageName +
+                ".plugin.sns.lucky.ui.LuckyRevealImageView";
     }
 
     private void initNames() {
@@ -192,7 +291,13 @@ public class WechatPackageNames {
         avatarMethod1 = "";
         avatarMethod2 = "";
         commentClass = this.packageName + ".protocal.b.";
-        commentMethod = "";
-        commentField = "";
+        blobDecodeMethod = "";
+        commentContentField = "";
+        commentTimeField = "";
+        snsContentClass = commentClass;
+        snsContentField = "";
+        snsAttrClass = commentClass;
+        snsAttrField = "";
+        luckyRevealImageView = "";
     }
 }

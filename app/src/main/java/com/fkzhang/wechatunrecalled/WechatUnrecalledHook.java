@@ -6,19 +6,26 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.util.SparseArrayCompat;
 import android.text.TextUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 
@@ -28,6 +35,8 @@ import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
+import static de.robv.android.xposed.XposedHelpers.newInstance;
+import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
 /**
  * Created by fkzhang on 1/16/2016.
@@ -36,19 +45,20 @@ public class WechatUnrecalledHook {
     private final SettingsHelper mSettings;
     protected Object mSQLDB;
     protected WechatPackageNames mP;
-    protected boolean mInit;
     protected Object mObject;
-    protected boolean mNotificationInit;
     protected Context mNotificationContext;
     protected Class<?> mNotificationClass;
-    protected int mNotificationIcon;
+    protected int mNotificationIcon = -1;
     protected Bitmap mNotificationLargeIcon;
     protected Class<?> mImgClss;
-    protected boolean mAvatarInit;
     protected Class<?> mAvatarLoader;
     protected HashMap<String, Bitmap> mAvatarCache;
     protected HashMap<String, String> mNicknameCache;
     protected Class<?> mCommentClass;
+    protected Object mSnsSQL;
+    protected Class<?> mDbClass1;
+    protected Class<?> mSnsContentClass;
+    protected Class<?> mSnsAttrClass;
 
     public WechatUnrecalledHook(WechatPackageNames packageNames) {
         this.mP = packageNames;
@@ -73,6 +83,11 @@ public class WechatUnrecalledHook {
         } catch (Throwable e) {
             XposedBridge.log(e);
         }
+        try {
+            hookApplicationPackageManager(loader);
+        } catch (Throwable t) {
+            XposedBridge.log(t);
+        }
     }
 
     protected void hookRecall(final ClassLoader loader) {
@@ -94,23 +109,28 @@ public class WechatUnrecalledHook {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                         init(loader);
-                        unRecallSnsComments(param.args[0]);
+                        if (mSnsSQL == null) {
+                            mSnsSQL = param.args[0];
+                        }
+                        unRecallSnsComments();
+                        unRecallSnsMoments();
                     }
                 });
+        try {
+            if (!TextUtils.isEmpty(mP.luckyRevealImageView)) {
+                findAndHookMethod(mP.luckyRevealImageView, loader, "getBlurBitmapFilePath",
+                        new XC_MethodReplacement() {
+                            @Override
+                            protected Object replaceHookedMethod(MethodHookParam methodHookParam) throws Throwable {
+                                return callMethod(methodHookParam.thisObject, "getOriginBitmapFilePath");
+                            }
+                        });
+            }
+        } catch (Throwable t) {
+            XposedBridge.log(t);
+        }
     }
 
-    protected void initDatabase(ClassLoader loader) {
-        if (mInit)
-            return;
-
-        mInit = true;
-        Class<?> c = findClass(mP.dbClass1, loader);
-        mObject = callMethod(callStaticMethod(c, mP.dbMethod1), mP.dbMethod2);
-        mSQLDB = getObjectField(mObject, mP.dbField);
-
-        // look for: field_imgPath in pluginsdk/model/app
-        mImgClss = findClass(mP.imageClass, loader);
-    }
 
     protected void updateMessageCount() {
         callMethod(mObject, mP.updateMsgId);
@@ -124,6 +144,7 @@ public class WechatUnrecalledHook {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         preventCommentRecall(param);
+                        preventMomentRecall(param);
                     }
                 });
         findAndHookMethod(mP.packageNameBase + ".kingkong.database.SQLiteDatabase", loader,
@@ -137,20 +158,72 @@ public class WechatUnrecalledHook {
                             return;
 
                         String s = ((String) param.args[0]).toLowerCase();
+
                         if (!s.equalsIgnoreCase("snscomment"))
                             return;
 
                         ContentValues v = (ContentValues) param.args[2];
                         String talker = (String) v.get("talker");
                         Bitmap icon = getAccountAvatar(talker);
-                        String name = getNickname(talker) + " " + mSettings.getString("new_comment", "(New comment)");
-                        String content = getCommentContent(v.getAsByteArray("curActionBuf"));
+                        String name = getNickname(talker) + " "
+                                + mSettings.getString("new_comment", "(新评论)");
+                        String content = getCommentContent(decodeBlob(mCommentClass,
+                                v.getAsByteArray("curActionBuf")));
                         showCommentNotification(name, content, icon);
                     }
                 });
     }
 
+
+    protected void hookApplicationPackageManager(ClassLoader loader) {
+        findAndHookMethod("android.app.ApplicationPackageManager", loader,
+                "getInstalledApplications", int.class, new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        @SuppressWarnings("unchecked") List<ApplicationInfo> applicationInfoList
+                                = (List<ApplicationInfo>) param.getResult();
+                        ArrayList<ApplicationInfo> to_remove = new ArrayList<>();
+                        for (ApplicationInfo info : applicationInfoList) {
+                            if (info.packageName.contains("com.fkzhang") ||
+                                    info.packageName.contains("de.robv.android.xposed.installer")) {
+                                to_remove.add(info);
+                            }
+                        }
+                        if (to_remove.isEmpty())
+                            return;
+
+                        applicationInfoList.removeAll(to_remove);
+                    }
+                });
+        findAndHookMethod("android.app.ApplicationPackageManager", loader,
+                "getInstalledPackages", int.class, new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        @SuppressWarnings("unchecked") List<PackageInfo> packageInfoList
+                                = (List<PackageInfo>) param.getResult();
+                        ArrayList<PackageInfo> to_remove = new ArrayList<>();
+                        for (PackageInfo info : packageInfoList) {
+                            if (info.packageName.contains("com.fkzhang") ||
+                                    info.packageName.contains("de.robv.android.xposed.installer")) {
+                                to_remove.add(info);
+                            }
+                        }
+                        if (to_remove.isEmpty())
+                            return;
+
+                        packageInfoList.removeAll(to_remove);
+                    }
+                });
+    }
+
     protected void preventMsgRecall(XC_MethodHook.MethodHookParam param) {
+        String xml = (String) param.args[0];
+        String tag = (String) param.args[1];
+        if (TextUtils.isEmpty(xml) || TextUtils.isEmpty(tag) ||
+                !tag.equals("sysmsg") || !xml.contains("revokemsg")) {
+            return;
+        }
+
         @SuppressWarnings("unchecked") Map<String, String> map =
                 (Map<String, String>) param.getResult();
         if (map == null)
@@ -164,17 +237,15 @@ public class WechatUnrecalledHook {
         if (type == null || !type.equals("revokemsg"))
             return;
 
+
         map.put(key, null);
         param.setResult(map);
 
         String talker = map.get(".sysmsg.revokemsg.session");
         String replacemsg = map.get(".sysmsg.revokemsg.replacemsg");
         String msgsvrid = map.get(".sysmsg.revokemsg.newmsgid");
-        if (replacemsg.contains("撤回")) {
-            replacemsg = replacemsg.replaceAll("撤回了", "尝试撤回");
-        } else {
-            replacemsg = replacemsg.replaceAll("recalled", "tried to recall");
-        }
+        replacemsg = replacemsg.replaceAll("撤回了", "尝试撤回")
+                .replaceAll("recalled", "tried to recall");
         mSettings.reload();
         replacemsg += " " + mSettings.getString("recalled", "(Prevented)");
 
@@ -194,8 +265,9 @@ public class WechatUnrecalledHook {
             int t = cursor.getInt(cursor.getColumnIndex("type"));
             switch (t) {
                 case 1: // text
-                    showTextNotification(replacemsg, content, icon);
-                    if (mSettings.getBoolean("show_content", false)) {
+                    showTextNotification(talker, replacemsg, content, icon);
+                    if (mSettings.getBoolean("show_content", false)
+                            && !TextUtils.isEmpty(content)) {
                         replacemsg += ": " + content;
                     }
                     break;
@@ -207,7 +279,7 @@ public class WechatUnrecalledHook {
                         intent.putExtra("img_gallery_talker", talker);
                         intent.putExtra("img_gallery_msg_svr_id", Long.parseLong(msgsvrid));
                         String summary = mSettings.getString("recalled_img_summary",
-                                "View in full screen mode");
+                                "[图片] 点击查看");
                         showImageNotification(replacemsg, bitmap, intent, summary, icon);
                     }
                     break;
@@ -216,30 +288,51 @@ public class WechatUnrecalledHook {
                     intent.putExtra("img_gallery_talker", talker);
                     intent.putExtra("img_gallery_msg_svr_id", Long.parseLong(msgsvrid));
                     String summary = mSettings.getString("recalled_video_summary",
-                            "[Video] View in full screen mode");
+                            "[小视频] 点击查看");
                     showImageNotification(replacemsg, null, intent, summary, icon);
                     break;
             }
         }
 
         long createTime = cursor.getLong(cursor.getColumnIndex("createTime"));
+        int idx = cursor.getColumnIndexOrThrow("talkerId");
+        int talkerId = -1;
+        if (idx != -1) {
+            talkerId = cursor.getInt(cursor.getColumnIndex("talkerId"));
+        }
         cursor.close();
-        insertMessage(talker, replacemsg, createTime + 1);
+        insertMessage(talker, talkerId, replacemsg, createTime + 1);
     }
 
-    protected void unRecallSnsComments(Object SQL) {
-        String query = "SELECT rowid FROM SnsComment WHERE commentflag=1";
-        Cursor cursor = (Cursor) callMethod(SQL, "rawQuery", query, null);
+    protected void unRecallSnsComments() {
+        String query = "SELECT commentSvrID,curActionBuf FROM SnsComment WHERE commentflag=1";
+        Cursor cursor = rawQuerySns(query);
 
         if (cursor == null || !cursor.moveToFirst())
             return;
 
-        ContentValues v = new ContentValues();
-        v.put("commentflag", 0);
+        do {
+            ContentValues v = new ContentValues();
+            v.put("commentSvrID", cursor.getString(cursor.getColumnIndex("commentSvrID")));
+            v.put("curActionBuf", cursor.getBlob(cursor.getColumnIndex("curActionBuf")));
+            unsetCommentDeleteFlag(v);
+        } while (cursor.moveToNext());
+        cursor.close();
+    }
+
+    protected void unRecallSnsMoments() {
+        String query = "SELECT snsId,content FROM SnsInfo WHERE sourceType=0";
+        Cursor cursor = rawQuerySns(query);
+
+        if (cursor == null || !cursor.moveToFirst())
+            return;
 
         do {
-            String rowid = cursor.getString(cursor.getColumnIndex("rowid"));
-            callMethod(SQL, "update", "SnsComment", v, "rowid = ?", new String[]{rowid});
+            ContentValues v = new ContentValues();
+            v.put("sourceType", 2);
+            v.put("snsId", cursor.getString(cursor.getColumnIndex("snsId")));
+            v.put("content", cursor.getBlob(cursor.getColumnIndex("content")));
+            unsetSnsDeleteFlag(v);
         } while (cursor.moveToNext());
         cursor.close();
     }
@@ -259,16 +352,34 @@ public class WechatUnrecalledHook {
             String talker = v.getAsString("talker");
             Bitmap icon = getAccountAvatar(talker);
             String name = getNickname(talker) + " " +
-                    mSettings.getString("comment_recall_content", "comment_recall_content");
-            String content = getCommentContent(v.getAsByteArray("curActionBuf"));
+                    mSettings.getString("comment_recall_content", "");
+            String content = getCommentContent(decodeBlob(mCommentClass,
+                    v.getAsByteArray("curActionBuf")));
+
+            unsetCommentDeleteFlag(v);
 
             showCommentNotification(name, content, icon);
         }
     }
 
-    protected void insertMessage(String talker, String msg, long createTime) {
-        int contactId = getTalkerId(talker);
-        if (contactId == -1)
+    public void preventMomentRecall(XC_MethodHook.MethodHookParam param) {
+        String table = (String) param.args[0];
+        if (!table.equalsIgnoreCase("snsinfo"))
+            return;
+        mSettings.reload();
+
+        ContentValues v = (ContentValues) param.args[1];
+        if (v.containsKey("sourceType") && v.getAsInteger("sourceType") == 0) {
+            param.setResult(null); // prevent call
+            unsetSnsDeleteFlag(v);
+            return;
+        }
+
+        updateSnsCommentChange(param);
+    }
+
+    protected void insertMessage(String talker, int talkerId, String msg, long createTime) {
+        if (talkerId == -1)
             return;
 
         int type = 10000;
@@ -283,7 +394,7 @@ public class WechatUnrecalledHook {
         v.put("createTime", createTime);
         v.put("talker", talker);
         v.put("content", msg);
-        v.put("talkerid", contactId);
+        v.put("talkerid", talkerId);
         insertSQL("message", "", v);
         updateMessageCount();
     }
@@ -296,19 +407,6 @@ public class WechatUnrecalledHook {
         cursor.close();
         return id;
     }
-
-    protected int getTalkerId(String talker) {
-        String query = "SELECT rowid FROM rcontact WHERE username = '" + talker + "'";
-        Cursor cursor = rawQuery(query);
-
-        int contactId = -1;
-        if (cursor != null && cursor.moveToFirst()) {
-            contactId = cursor.getInt(cursor.getColumnIndex("rowid"));
-            cursor.close();
-        }
-        return contactId;
-    }
-
 
     protected void insertSQL(String table, String selection, ContentValues contentValues) {
         if (mSQLDB == null)
@@ -336,21 +434,47 @@ public class WechatUnrecalledHook {
         return rawQuery(query, new String[]{username});
     }
 
-    protected void showTextNotification(String title, String content, Bitmap icon) {
+    protected Object getSnsCommentBlob(String snsId) {
+        String query = "SELECT attrBuf FROM SnsInfo WHERE snsId = " + snsId;
+        Cursor cursor = rawQuerySns(query);
+
+        if (cursor == null || !cursor.moveToFirst())
+            return null;
+
+        byte[] blob = cursor.getBlob(cursor.getColumnIndex("attrBuf"));
+        return decodeBlob(mSnsAttrClass, blob);
+    }
+
+    protected Cursor rawQuerySns(String query) {
+        if (mSnsSQL == null)
+            return null;
+        return (Cursor) callMethod(mSnsSQL, "rawQuery", query, null);
+    }
+
+    protected void updateSns(String table, ContentValues contentValues, String selection, String[] whereClause) {
+        if (mSnsSQL == null)
+            return;
+        callMethod(mSnsSQL, "update", table, contentValues, selection, whereClause);
+    }
+
+    protected void showTextNotification(String username, String title, String content, Bitmap icon) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mNotificationContext)
                 .setLargeIcon(icon)
                 .setSmallIcon(mNotificationIcon)
                 .setContentTitle(title)
                 .setAutoCancel(true);
 
-        if (content != null) {
+        if (!TextUtils.isEmpty(content)) {
             builder.setContentText(content);
         }
 
-        Intent resultIntent = new Intent();
-        resultIntent.setClassName(mNotificationContext.getPackageName(), mNotificationClass.getName());
+        Intent intent = new Intent();
+        intent.setClassName(mNotificationContext.getPackageName(), mP.packageName + ".ui.chatting.ChattingUI");
 
-        showNotification(builder, resultIntent);
+        intent.putExtra("Chat_User", username);
+        intent.putExtra("Chat_Mode", 1);
+
+        showNotification(builder, intent);
     }
 
     protected void showCommentNotification(String title, String content, Bitmap icon) {
@@ -417,23 +541,6 @@ public class WechatUnrecalledHook {
         mNotificationManager.notify(getNotificationId(), notification);
     }
 
-    public void initNotification(ClassLoader loader) {
-        if (mNotificationInit)
-            return;
-
-        // look for: notification_icon
-        mNotificationInit = true;
-        mNotificationContext = (Context) callStaticMethod(findClass(mP.contextGetter, loader),
-                "getContext");
-        mNotificationClass = findClass(mP.packageName + ".ui.LauncherUI", loader);
-        mNotificationIcon = (int) callStaticMethod(
-                findClass(mP.iconClass, loader), mP.iconMethod);
-        mNotificationLargeIcon = BitmapFactory.decodeResource(mNotificationContext
-                .getResources(), mNotificationContext.getApplicationInfo().icon);
-        // look for: curActionBuf
-        mCommentClass = findClass(mP.commentClass, loader);
-    }
-
     protected Bitmap getImage(String path) {
         String str = (String) callMethod(callStaticMethod(mImgClss, mP.imageMethod1),
                 mP.imageMethod2, path);
@@ -441,13 +548,6 @@ public class WechatUnrecalledHook {
             return null;
 
         return BitmapFactory.decodeFile(str);
-    }
-
-    protected void initAvatarLoader(ClassLoader loader) {
-        if (mAvatarInit)
-            return;
-        mAvatarInit = true;
-        mAvatarLoader = findClass(mP.avatarClass, loader);
     }
 
     protected Bitmap getAccountAvatar(String accountName) {
@@ -478,9 +578,90 @@ public class WechatUnrecalledHook {
     }
 
     protected void init(ClassLoader loader) {
-        initDatabase(loader);
-        initNotification(loader);
-        initAvatarLoader(loader);
+        if (mDbClass1 == null) {
+            try {
+                mDbClass1 = findClass(mP.dbClass1, loader);
+            } catch (Throwable t) {
+            }
+        }
+        if (mObject == null && mDbClass1 != null) {
+            try {
+                mObject = callMethod(callStaticMethod(mDbClass1, mP.dbMethod1), mP.dbMethod2);
+            } catch (Throwable t) {
+            }
+        }
+        if (mSQLDB == null && mObject != null) {
+            try {
+                mSQLDB = getObjectField(mObject, mP.dbField);
+            } catch (Throwable t) {
+            }
+        }
+
+        // look for: field_imgPath in pluginsdk/model/app
+        if (mImgClss == null) {
+            try {
+                mImgClss = findClass(mP.imageClass, loader);
+            } catch (Throwable t) {
+            }
+        }
+
+        // look for: notification_icon
+        if (mNotificationContext == null) {
+            try {
+                mNotificationContext = (Context) callStaticMethod(findClass(mP.contextGetter, loader),
+                        "getContext");
+            } catch (Throwable t) {
+            }
+        }
+        if (mNotificationClass == null) {
+            try {
+                mNotificationClass = findClass(mP.packageName + ".ui.LauncherUI", loader);
+            } catch (Throwable t) {
+            }
+        }
+        if (mNotificationIcon == -1) {
+            try {
+                mNotificationIcon = (int) callStaticMethod(
+                        findClass(mP.iconClass, loader), mP.iconMethod);
+            } catch (Throwable t) {
+            }
+        }
+        if (mNotificationLargeIcon == null && mNotificationContext != null) {
+            try {
+                mNotificationLargeIcon = BitmapFactory.decodeResource(mNotificationContext
+                        .getResources(), mNotificationContext.getApplicationInfo().icon);
+            } catch (Throwable t) {
+            }
+        }
+
+        // look for: field_curActionBuf
+        if (mCommentClass == null) {
+            try {
+                mCommentClass = findClass(mP.commentClass, loader);
+            } catch (Throwable t) {
+            }
+        }
+        if (mAvatarLoader == null) {
+            try {
+                mAvatarLoader = findClass(mP.avatarClass, loader);
+            } catch (Throwable t) {
+            }
+        }
+        if (mSnsContentClass == null) {
+            // look for in sns: field_content
+            try {
+                mSnsContentClass = findClass(mP.snsContentClass, loader);
+            } catch (Throwable t) {
+            }
+        }
+        if (mSnsAttrClass == null) {
+            // look for field_attrBuf
+            try {
+                mSnsAttrClass = findClass(mP.snsAttrClass, loader);
+            } catch (Throwable t) {
+            }
+        }
+
     }
 
     protected String getNickname(String username) {
@@ -502,9 +683,131 @@ public class WechatUnrecalledHook {
     }
 
 
-    public String getCommentContent(byte[] blob) {
-        Object o = callMethod(XposedHelpers.newInstance(mCommentClass), mP.commentMethod,
-                new Class[]{byte[].class}, blob);
-        return (String) getObjectField(o, mP.commentField);
+    protected String getCommentContent(Object o) {
+        if (o == null)
+            return null;
+        return (String) getObjectField(o, mP.commentContentField);
+    }
+
+    protected Object decodeBlob(Class<?> cls, byte[] blob) {
+        if (cls == null || blob == null)
+            return null;
+
+        try {
+            return callMethod(newInstance(cls), mP.blobDecodeMethod,
+                    new Class[]{byte[].class}, blob);
+        } catch (Throwable t) {
+            XposedBridge.log(t);
+        }
+        return null;
+    }
+
+    protected String getSnsContent(Object o) {
+        if (o == null)
+            return null;
+        return (String) getObjectField(o, mP.snsContentField);
+    }
+
+    protected SparseArrayCompat<Object> getSnsCommentContent(Object o) {
+        if (o == null)
+            return null;
+        LinkedList linkedList = (LinkedList) getObjectField(o, mP.snsAttrField);
+        SparseArrayCompat<Object> comments = new SparseArrayCompat<>(linkedList.size());
+        for (Object item : linkedList) {
+            int time = (int) getObjectField(item, mP.commentTimeField);
+            comments.put(time, item);
+        }
+        return comments;
+    }
+
+    protected byte[] encodeContentBlob(Object o) {
+        if (o == null)
+            return null;
+
+        try {
+            return (byte[]) callMethod(o, "toByteArray");
+        } catch (Throwable t) {
+            XposedBridge.log(t);
+        }
+        return null;
+    }
+
+    protected void unsetSnsDeleteFlag(ContentValues v) {
+        Object contentObject = decodeBlob(mSnsContentClass, v.getAsByteArray("content"));
+        if (contentObject == null)
+            return;
+
+        String content = removeDeletedTag(getSnsContent(contentObject));
+
+        content = mSettings.getString("deleted", "[已删除]") + "\n" + content;
+        setObjectField(contentObject, mP.snsContentField, content);
+
+        ContentValues c = new ContentValues();
+        c.put("content", encodeContentBlob(contentObject));
+        if (v.getAsInteger("sourceType") != 0) {
+            c.put("sourceType", v.getAsInteger("sourceType"));
+        }
+        updateSns("SnsInfo", c, "snsId = ?", new String[]{v.getAsString("snsId")});
+    }
+
+    protected void unsetCommentDeleteFlag(ContentValues v) {
+        Object commentObject = decodeBlob(mCommentClass, v.getAsByteArray("curActionBuf"));
+        String content = removeDeletedTag(getCommentContent(commentObject));
+        content += " " + mSettings.getString("deleted", "[已删除]");
+        setObjectField(commentObject, mP.commentContentField, content);
+        ContentValues c = new ContentValues();
+        c.put("curActionBuf", encodeContentBlob(commentObject));
+        c.put("commentflag", 0);
+        updateSns("SnsComment", c, "commentSvrID = ?", new String[]{v.getAsString("commentSvrID")});
+    }
+
+    protected static String removeDeletedTag(String content) {
+        if (content.contains("[已删除]") || content.contains("[Deleted]")) {
+            content = content.replaceAll("\\[已删除\\]", "").replaceAll("\\[Deleted\\]", "").trim();
+        }
+        return content;
+    }
+
+    protected void updateSnsCommentChange(XC_MethodHook.MethodHookParam param) {
+        ContentValues v = (ContentValues) param.args[1];
+
+        Object attrObject = decodeBlob(mSnsAttrClass, v.getAsByteArray("attrBuf"));
+        SparseArrayCompat<Object> comments = getSnsCommentContent(attrObject);
+
+        if (comments == null || comments.size() == 0)
+            return;
+
+        Object oldAttrObject = getSnsCommentBlob(v.getAsString("snsId"));
+        SparseArrayCompat<Object> oldComments = getSnsCommentContent(oldAttrObject);
+
+        if (oldComments == null || oldComments.size() == 0)
+            return;
+
+        // tag deleted comments
+        for (int i = 0; i < oldComments.size(); i++) {
+            int key = oldComments.keyAt(i);
+            if (comments.indexOfKey(key) < 0) { // not found
+                Object item = oldComments.get(key);
+                String content = removeDeletedTag(getCommentContent(item)) + " "
+                        + mSettings.getString("deleted", "[已删除]");
+                setObjectField(item, mP.commentContentField, content);
+            }
+        }
+
+        // add new comments
+        for (int i = 0; i < comments.size(); i++) {
+            int key = comments.keyAt(i);
+            if (oldComments.indexOfKey(key) < 0) { // not found
+                oldComments.put(key, comments.get(key));
+            }
+        }
+
+        // replace original
+        LinkedList<Object> linkedList = new LinkedList<>();
+        for (int i = 0; i < oldComments.size(); i++) {
+            linkedList.add(oldComments.get(oldComments.keyAt(i)));
+        }
+        setObjectField(attrObject, mP.snsAttrField, linkedList);
+        v.put("attrBuf", encodeContentBlob(attrObject));
     }
 }

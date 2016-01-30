@@ -70,6 +70,8 @@ public class XposedInit implements IXposedHookLoadPackage {
             case "6.3.9":
             case "6.3.8":
             case "6.3.5":
+            case "6.3.0":
+            case "6.2.5":
                 mWechatHooks.put(uid, new WechatUnrecalledHook(new WechatPackageNames(packageName, version)));
                 break;
             case "6.0.0": // 6.0 golden modified version
@@ -82,7 +84,7 @@ public class XposedInit implements IXposedHookLoadPackage {
                 }
                 break;
             default:
-                XposedBridge.log("wechat version " + version + " not supported, please upgrade");
+                XposedBridge.log("WechatUnrecalled: wechat version " + version + " not supported, please upgrade");
                 return null;
         }
 

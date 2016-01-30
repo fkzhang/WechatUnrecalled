@@ -60,17 +60,11 @@ public class WechatUnrecalledHook600 extends WechatUnrecalledHook {
         } catch (Exception e) {
             XposedBridge.log(e);
         }
-    }
-
-
-    protected void hookSns(ClassLoader loader) {
-        findAndHookConstructor(mP.snsClass, loader,
-                mP.snsMethod, new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        unRecallSnsComments(param.args[0]);
-                    }
-                });
+        try {
+            hookApplicationPackageManager(loader);
+        } catch (Throwable t) {
+            XposedBridge.log(t);
+        }
     }
 
     protected void hookStorageObject(final ClassLoader loader) {
@@ -83,7 +77,7 @@ public class WechatUnrecalledHook600 extends WechatUnrecalledHook {
                 });
     }
 
-    protected void insertMessage(String talker, String msg, long createTime) {
+    protected void insertMessage(String talker, int talkerId, String msg, long createTime) {
         int type = 10000;
         int status = 3;
         long msgSvrId = createTime + (new Random().nextInt());
