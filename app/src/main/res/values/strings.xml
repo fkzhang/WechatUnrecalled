@@ -15,4 +15,6 @@
     <string name="new_comment">(New comment)</string>
     <string name="enable_new_comment_notification">Enable new comment notification</string>
     <string name="deleted">[Deleted]</string>
+    <string name="prevent_moments_recall">Prevent moments recall</string>
+    <string name="prevent_comments_recall">Prevent comments recall</string>
 </resources>

@@ -14,9 +14,10 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
 
     private MenuItem mMenuItemIcon;
+    private SettingsHelper mSettingsHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,48 +26,37 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final SettingsHelper settingsHelper = new SettingsHelper(this, "com.fkzhang.wechatunrecalled");
+        mSettingsHelper = new SettingsHelper(this, "com.fkzhang.wechatunrecalled");
 
         Switch enable_recall_notification = (Switch) findViewById(R.id.enable_recall_notification);
-        enable_recall_notification.setChecked(settingsHelper.getBoolean("enable_recall_notification", true));
-        enable_recall_notification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                settingsHelper.setBoolean("enable_recall_notification", isChecked);
-            }
-        });
+        enable_recall_notification.setChecked(mSettingsHelper.getBoolean("enable_recall_notification", true));
+        enable_recall_notification.setOnCheckedChangeListener(this);
 
         Switch enable_comment_recall_notification = (Switch) findViewById(R.id.enable_comment_recall_notification);
-        enable_comment_recall_notification.setChecked(settingsHelper.getBoolean("enable_comment_recall_notification", true));
-        enable_comment_recall_notification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                settingsHelper.setBoolean("enable_comment_recall_notification", isChecked);
-            }
-        });
+        enable_comment_recall_notification.setChecked(mSettingsHelper.getBoolean("enable_comment_recall_notification", true));
+        enable_comment_recall_notification.setOnCheckedChangeListener(this);
+
         Switch enable_new_comment_notification = (Switch) findViewById(R.id.enable_new_comment_notification);
-        enable_new_comment_notification.setChecked(settingsHelper.getBoolean("enable_new_comment_notification", false));
-        enable_new_comment_notification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                settingsHelper.setBoolean("enable_new_comment_notification", isChecked);
-            }
-        });
+        enable_new_comment_notification.setChecked(mSettingsHelper.getBoolean("enable_new_comment_notification", false));
+        enable_new_comment_notification.setOnCheckedChangeListener(this);
 
         Switch show_content = (Switch) findViewById(R.id.show_content);
-        show_content.setChecked(settingsHelper.getBoolean("show_content", false));
-        show_content.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                settingsHelper.setBoolean("show_content", isChecked);
-            }
-        });
+        show_content.setChecked(mSettingsHelper.getBoolean("show_content", false));
+        show_content.setOnCheckedChangeListener(this);
+
+        Switch prevent_moments_recall = (Switch) findViewById(R.id.enable_moment_recall_prevention);
+        prevent_moments_recall.setChecked(mSettingsHelper.getBoolean("prevent_moments_recall", true));
+        prevent_moments_recall.setOnCheckedChangeListener(this);
+
+        Switch prevent_comments_recall = (Switch) findViewById(R.id.enable_comment_recall_prevention);
+        prevent_comments_recall.setChecked(mSettingsHelper.getBoolean("prevent_comments_recall", true));
+        prevent_comments_recall.setOnCheckedChangeListener(this);
 
         EditText recalled_message = (EditText) findViewById(R.id.editText);
-        if (TextUtils.isEmpty(settingsHelper.getString("recalled", null))) {
-            settingsHelper.setString("recalled", getString(R.string.recalled_msg_content));
+        if (TextUtils.isEmpty(mSettingsHelper.getString("recalled", null))) {
+            mSettingsHelper.setString("recalled", getString(R.string.recalled_msg_content));
         }
-        recalled_message.setText(settingsHelper.getString("recalled", "(Prevented)"));
+        recalled_message.setText(mSettingsHelper.getString("recalled", "(Prevented)"));
         recalled_message.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -84,16 +74,16 @@ public class MainActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(t))
                     return;
 
-                settingsHelper.setString("recalled", s.toString());
+                mSettingsHelper.setString("recalled", s.toString());
             }
         });
 
         EditText comment_recalled_message = (EditText) findViewById(R.id.editText2);
-        if (TextUtils.isEmpty(settingsHelper.getString("comment_recall_content", null))) {
-            settingsHelper.setString("comment_recall_content",
+        if (TextUtils.isEmpty(mSettingsHelper.getString("comment_recall_content", null))) {
+            mSettingsHelper.setString("comment_recall_content",
                     getString(R.string.comment_recall_content));
         }
-        comment_recalled_message.setText(settingsHelper.getString("comment_recall_content",
+        comment_recalled_message.setText(mSettingsHelper.getString("comment_recall_content",
                 getString(R.string.comment_recall_content)));
         comment_recalled_message.addTextChangedListener(new TextWatcher() {
             @Override
@@ -112,13 +102,13 @@ public class MainActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(t))
                     return;
 
-                settingsHelper.setString("comment_recall_content", s.toString());
+                mSettingsHelper.setString("comment_recall_content", s.toString());
             }
         });
 
-        settingsHelper.setString("recalled_img_summary", getString(R.string.recalled_img_summary));
-        settingsHelper.setString("recalled_video_summary", getString(R.string.recalled_video_summary));
-        settingsHelper.setString("new_comment", getString(R.string.new_comment));
+        mSettingsHelper.setString("recalled_img_summary", getString(R.string.recalled_img_summary));
+        mSettingsHelper.setString("recalled_video_summary", getString(R.string.recalled_video_summary));
+        mSettingsHelper.setString("new_comment", getString(R.string.new_comment));
 
     }
 
@@ -170,5 +160,29 @@ public class MainActivity extends AppCompatActivity {
     private boolean isIconEnabled() {
         return this.getPackageManager().getComponentEnabledSetting(getIconComponentName()) ==
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        switch (buttonView.getId()) {
+            case R.id.enable_recall_notification:
+                mSettingsHelper.setBoolean("enable_recall_notification", isChecked);
+                break;
+            case R.id.enable_comment_recall_notification:
+                mSettingsHelper.setBoolean("enable_comment_recall_notification", isChecked);
+                break;
+            case R.id.enable_new_comment_notification:
+                mSettingsHelper.setBoolean("enable_new_comment_notification", isChecked);
+                break;
+            case R.id.show_content:
+                mSettingsHelper.setBoolean("show_content", isChecked);
+                break;
+            case R.id.enable_moment_recall_prevention:
+                mSettingsHelper.setBoolean("prevent_moments_recall", isChecked);
+                break;
+            case R.id.enable_comment_recall_prevention:
+                mSettingsHelper.setBoolean("prevent_comments_recall", isChecked);
+                break;
+        }
     }
 }

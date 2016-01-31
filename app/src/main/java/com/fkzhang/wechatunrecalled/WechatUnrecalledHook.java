@@ -112,6 +112,7 @@ public class WechatUnrecalledHook {
                         if (mSnsSQL == null) {
                             mSnsSQL = param.args[0];
                         }
+                        mSettings.reload();
                         unRecallSnsComments();
                         unRecallSnsMoments();
                     }
@@ -152,7 +153,6 @@ public class WechatUnrecalledHook {
                 new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        super.afterHookedMethod(param);
                         mSettings.reload();
                         if (!mSettings.getBoolean("enable_new_comment_notification", false))
                             return;
@@ -305,6 +305,8 @@ public class WechatUnrecalledHook {
     }
 
     protected void unRecallSnsComments() {
+        if (!mSettings.getBoolean("prevent_comments_recall", true))
+            return;
         String query = "SELECT commentSvrID,curActionBuf FROM SnsComment WHERE commentflag=1";
         Cursor cursor = rawQuerySns(query);
 
@@ -321,6 +323,9 @@ public class WechatUnrecalledHook {
     }
 
     protected void unRecallSnsMoments() {
+        if (!mSettings.getBoolean("prevent_moments_recall", true))
+            return;
+
         String query = "SELECT snsId,content FROM SnsInfo WHERE sourceType=0";
         Cursor cursor = rawQuerySns(query);
 
@@ -344,8 +349,12 @@ public class WechatUnrecalledHook {
         mSettings.reload();
 
         ContentValues v = (ContentValues) param.args[1];
-        if (v.containsKey("commentflag") && v.getAsInteger("commentflag") == 1) {
+        if (v.containsKey("commentflag") && v.getAsInteger("commentflag") == 1 &&
+                mSettings.getBoolean("prevent_comments_recall", true)) {
             param.setResult(null); // prevent call
+
+            unsetCommentDeleteFlag(v);
+
             if (!mSettings.getBoolean("enable_comment_recall_notification", true))
                 return;
 
@@ -353,11 +362,9 @@ public class WechatUnrecalledHook {
             Bitmap icon = getAccountAvatar(talker);
             String name = getNickname(talker) + " " +
                     mSettings.getString("comment_recall_content", "");
+
             String content = getCommentContent(decodeBlob(mCommentClass,
                     v.getAsByteArray("curActionBuf")));
-
-            unsetCommentDeleteFlag(v);
-
             showCommentNotification(name, content, icon);
         }
     }
@@ -369,13 +376,16 @@ public class WechatUnrecalledHook {
         mSettings.reload();
 
         ContentValues v = (ContentValues) param.args[1];
-        if (v.containsKey("sourceType") && v.getAsInteger("sourceType") == 0) {
+        if (v.containsKey("sourceType") && v.getAsInteger("sourceType") == 0 &&
+                mSettings.getBoolean("prevent_moments_recall", true)) {
             param.setResult(null); // prevent call
             unsetSnsDeleteFlag(v);
             return;
         }
 
-        updateSnsCommentChange(param);
+        if (mSettings.getBoolean("prevent_comments_recall", true)) {
+            updateSnsCommentChange(param);
+        }
     }
 
     protected void insertMessage(String talker, int talkerId, String msg, long createTime) {

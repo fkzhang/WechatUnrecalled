@@ -12,56 +12,78 @@
     tools:context="com.fkzhang.wechatunrecalled.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <Switch
-        android:id="@+id/enable_recall_notification"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:text="@string/enable_notification" />
-
-    <Switch
-        android:id="@+id/enable_comment_recall_notification"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/enable_recall_notification"
-        android:padding="15dp"
-        android:text="@string/enable_comment_recall_notification" />
-
-    <Switch
-        android:id="@+id/enable_new_comment_notification"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/enable_comment_recall_notification"
-        android:padding="15dp"
-        android:text="@string/enable_new_comment_notification" />
-
-    <Switch
-        android:id="@+id/show_content"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:layout_below="@id/enable_new_comment_notification"
-        android:text="@string/show_content" />
-
-    <EditText
-        android:id="@+id/editText"
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/show_content"
-        android:hint="@string/recalled_message"
-        android:padding="15dp" />
+        android:layout_alignParentStart="true">
 
-    <EditText
-        android:id="@+id/editText2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editText"
-        android:hint="@string/comment_recalled_message"
-        android:padding="15dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <Switch
+                android:id="@+id/enable_recall_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/enable_notification" />
+
+            <Switch
+                android:id="@+id/enable_comment_recall_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/enable_comment_recall_notification" />
+
+            <Switch
+                android:id="@+id/enable_new_comment_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/enable_new_comment_notification" />
+
+            <Switch
+                android:id="@+id/show_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/show_content" />
+
+            <Switch
+                android:id="@+id/enable_moment_recall_prevention"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/prevent_moments_recall" />
+
+            <Switch
+                android:id="@+id/enable_comment_recall_prevention"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/prevent_comments_recall" />
+
+            <EditText
+                android:id="@+id/editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/recalled_message"
+                android:padding="15dp" />
+
+            <EditText
+                android:id="@+id/editText2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/comment_recalled_message"
+                android:padding="15dp" />
+        </LinearLayout>
+
+
+    </ScrollView>
 
 
 </RelativeLayout>

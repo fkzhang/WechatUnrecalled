@@ -15,4 +15,6 @@
     <string name="new_comment">(新评论)</string>
     <string name="enable_new_comment_notification">开启新评论通知</string>
     <string name="deleted">[已删除]</string>
+    <string name="prevent_comments_recall">防止朋友圈撤回</string>
+    <string name="prevent_moments_recall">防止评论撤回</string>
 </resources>
