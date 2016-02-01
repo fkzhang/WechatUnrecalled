@@ -6,7 +6,7 @@ Prevent Wechat recalling chat messages and comments from sns (moments).
 
 支持金色共存版，LBE平行空间（双开大师）
 
-选择性的支持 6.0.0, 6.3.5, 6.3.8, 6.3.9, 6.3.11
+选择性的支持 6.0.0, 6.3.5, 6.3.8, 6.3.9, 6.3.11,6.3.13
 
 [download/下载](https://github.com/fkzhang/WechatUnrecalled/releases)
 
