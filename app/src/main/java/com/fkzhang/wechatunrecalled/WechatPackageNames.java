@@ -246,6 +246,7 @@ public class WechatPackageNames {
                 ".plugin.sns.lucky.ui.LuckyRevealImageView";
     }
 
+
     private void set6311() {
         recallClass += "q";
         recallMethod = "J";
