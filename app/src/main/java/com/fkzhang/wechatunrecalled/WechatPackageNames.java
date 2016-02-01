@@ -33,6 +33,10 @@ public class WechatPackageNames {
     public String luckyRevealImageView;
     public String snsAttrClass;
     public String snsAttrField;
+    public String snsLuckyMoneyClass1;
+    public String snsLuckyMoneyBlur;
+    public String snsLuckyMoneyOrignal;
+    public String snsLuckyMoneyClass2;
 
     public WechatPackageNames(String packageName, String version) {
         this.packageName = packageName;
@@ -40,6 +44,9 @@ public class WechatPackageNames {
 
         initNames();
         switch (version) {
+            case "6.3.13":
+                set6313();
+                break;
             case "6.3.11":
                 set6311();
                 break;
@@ -239,7 +246,6 @@ public class WechatPackageNames {
                 ".plugin.sns.lucky.ui.LuckyRevealImageView";
     }
 
-
     private void set6311() {
         recallClass += "q";
         recallMethod = "J";
@@ -271,6 +277,15 @@ public class WechatPackageNames {
                 ".plugin.sns.lucky.ui.LuckyRevealImageView";
     }
 
+    private void set6313() {
+        set6311();
+        luckyRevealImageView = "";
+        snsLuckyMoneyClass1 += "h";
+        snsLuckyMoneyClass2 += "add";
+        snsLuckyMoneyOrignal = "h";
+        snsLuckyMoneyBlur = "g";
+    }
+
     private void initNames() {
         recallClass = this.packageName + ".sdk.platformtools.";
         recallMethod = "";
@@ -299,5 +314,9 @@ public class WechatPackageNames {
         snsAttrClass = commentClass;
         snsAttrField = "";
         luckyRevealImageView = "";
+        snsLuckyMoneyClass1 = packageName + ".plugin.sns.data.";
+        snsLuckyMoneyOrignal = "";
+        snsLuckyMoneyBlur = "";
+        snsLuckyMoneyClass2 = packageName + ".protocal.b.";
     }
 }

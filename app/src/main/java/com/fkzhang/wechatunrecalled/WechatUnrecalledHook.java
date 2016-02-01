@@ -130,6 +130,22 @@ public class WechatUnrecalledHook {
         } catch (Throwable t) {
             XposedBridge.log(t);
         }
+
+        try {
+            if (!TextUtils.isEmpty(mP.snsLuckyMoneyClass1)) {
+                findAndHookMethod(mP.snsLuckyMoneyClass1, loader, mP.snsLuckyMoneyBlur,
+                        mP.snsLuckyMoneyClass2,
+                        new XC_MethodReplacement() {
+                            @Override
+                            protected Object replaceHookedMethod(MethodHookParam methodHookParam) throws Throwable {
+                                return callMethod(methodHookParam.thisObject,
+                                        mP.snsLuckyMoneyOrignal, methodHookParam.args[0]);
+                            }
+                        });
+            }
+        } catch (Throwable t) {
+            XposedBridge.log(t);
+        }
     }
 
 

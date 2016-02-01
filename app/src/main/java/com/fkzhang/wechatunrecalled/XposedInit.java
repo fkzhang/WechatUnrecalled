@@ -66,6 +66,7 @@ public class XposedInit implements IXposedHookLoadPackage {
         }
 
         switch (version) {
+            case "6.3.13":
             case "6.3.11":
             case "6.3.9":
             case "6.3.8":
