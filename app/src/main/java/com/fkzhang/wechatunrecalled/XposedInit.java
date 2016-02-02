@@ -1,6 +1,7 @@
 package com.fkzhang.wechatunrecalled;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.SparseArray;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -26,7 +27,6 @@ public class XposedInit implements IXposedHookLoadPackage {
         if (!(packageName.contains("com.tencen") && packageName.contains("mm")))
             return;
 
-//        XposedBridge.log("Loaded app: " + loadPackageParam.packageName);
 
         try {
             Object activityThread = callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
@@ -35,6 +35,8 @@ public class XposedInit implements IXposedHookLoadPackage {
             try {
                 String versionName = mContext.getPackageManager().getPackageInfo(packageName,
                         0).versionName;
+
+                XposedBridge.log("Loaded app: " + loadPackageParam.packageName + " " + versionName);
 
                 WechatUnrecalledHook hooks = getHooks(packageName, versionName,
                         loadPackageParam.appInfo.uid);
@@ -58,35 +60,21 @@ public class XposedInit implements IXposedHookLoadPackage {
             return mWechatHooks.get(uid);
         }
 
-        String version;
-        if (versionName == null) {
-            version = "null";
+        if (TextUtils.isEmpty(versionName)) {
+            if (packageName.equals("com.tencent.mm4")) { // support modified 6.3.5 version
+                mWechatHooks.put(uid, new WechatUnrecalledHook(new WechatPackageNames("com.tencent.mm",
+                        "6.3.5")));
+            }
+        } else if (versionName.contains("6.3.13") || versionName.contains("6.3.11") ||
+                versionName.contains("6.3.9") || versionName.contains("6.3.8") ||
+                versionName.contains("6.3.5") || versionName.contains("6.3.0") ||
+                versionName.contains("6.2.5")) {
+            mWechatHooks.put(uid, new WechatUnrecalledHook(new WechatPackageNames(packageName, versionName)));
+        } else if (versionName.contains("6.0.0")) { // 6.0 golden modified version
+            mWechatHooks.put(uid, new WechatUnrecalledHook600(new WechatPackageNames(packageName, versionName)));
         } else {
-            version = versionName.substring(0, versionName.lastIndexOf("."));
-        }
-
-        switch (version) {
-            case "6.3.13":
-            case "6.3.11":
-            case "6.3.9":
-            case "6.3.8":
-            case "6.3.5":
-            case "6.3.0":
-            case "6.2.5":
-                mWechatHooks.put(uid, new WechatUnrecalledHook(new WechatPackageNames(packageName, version)));
-                break;
-            case "6.0.0": // 6.0 golden modified version
-                mWechatHooks.put(uid, new WechatUnrecalledHook600(new WechatPackageNames(packageName, version)));
-                break;
-            case "null":
-                if (packageName.equals("com.tencent.mm4")) { // support modified 6.3.5 version
-                    mWechatHooks.put(uid, new WechatUnrecalledHook(new WechatPackageNames("com.tencent.mm",
-                            "6.3.5")));
-                }
-                break;
-            default:
-                XposedBridge.log("WechatUnrecalled: wechat version " + version + " not supported, please upgrade");
-                return null;
+            XposedBridge.log("wechat version " + versionName + " not supported, please upgrade");
+            return null;
         }
 
         return mWechatHooks.get(uid);

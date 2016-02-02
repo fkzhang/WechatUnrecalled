@@ -38,36 +38,27 @@ public class WechatPackageNames {
     public String snsLuckyMoneyOrignal;
     public String snsLuckyMoneyClass2;
 
-    public WechatPackageNames(String packageName, String version) {
+    public WechatPackageNames(String packageName, String versionName) {
         this.packageName = packageName;
         this.packageNameBase = packageName.substring(0, packageName.lastIndexOf("."));
 
         initNames();
-        switch (version) {
-            case "6.3.13":
-                set6313();
-                break;
-            case "6.3.11":
-                set6311();
-                break;
-            case "6.3.9":
-                set639();
-                break;
-            case "6.3.8":
-                set638();
-                break;
-            case "6.3.5":
-                set635();
-                break;
-            case "6.3.0":
-                set630();
-                break;
-            case "6.2.5":
-                set625();
-                break;
-            case "6.0.0":
-                set600();
-                break;
+        if (versionName.contains("6.3.13")) {
+            set6313();
+        } else if (versionName.contains("6.3.11")) {
+            set6311();
+        } else if (versionName.contains("6.3.9")) {
+            set639();
+        } else if (versionName.contains("6.3.8")) {
+            set638();
+        } else if (versionName.contains("6.3.5")) {
+            set635();
+        } else if (versionName.contains("6.3.0")) {
+            set630();
+        } else if (versionName.contains("6.2.5")) {
+            set625();
+        } else if (versionName.contains("6.0.0")) {
+            set600();
         }
     }
 
@@ -281,7 +272,7 @@ public class WechatPackageNames {
     private void set6313() {
         set6311();
         luckyRevealImageView = "";
-        snsLuckyMoneyClass1 += "h";
+        snsLuckyMoneyClass1 = packageName + ".plugin.sns.data.h";
         snsLuckyMoneyClass2 += "add";
         snsLuckyMoneyOrignal = "h";
         snsLuckyMoneyBlur = "g";
@@ -315,7 +306,7 @@ public class WechatPackageNames {
         snsAttrClass = commentClass;
         snsAttrField = "";
         luckyRevealImageView = "";
-        snsLuckyMoneyClass1 = packageName + ".plugin.sns.data.";
+        snsLuckyMoneyClass1 = "";
         snsLuckyMoneyOrignal = "";
         snsLuckyMoneyBlur = "";
         snsLuckyMoneyClass2 = packageName + ".protocal.b.";

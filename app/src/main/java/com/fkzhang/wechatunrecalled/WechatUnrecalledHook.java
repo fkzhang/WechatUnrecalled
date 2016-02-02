@@ -59,6 +59,7 @@ public class WechatUnrecalledHook {
     protected Class<?> mDbClass1;
     protected Class<?> mSnsContentClass;
     protected Class<?> mSnsAttrClass;
+    private boolean mDebug = false;
 
     public WechatUnrecalledHook(WechatPackageNames packageNames) {
         this.mP = packageNames;
@@ -108,6 +109,7 @@ public class WechatUnrecalledHook {
                 mP.snsMethod, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        log("hooked in wechat sns");
                         init(loader);
                         if (mSnsSQL == null) {
                             mSnsSQL = param.args[0];
@@ -835,5 +837,17 @@ public class WechatUnrecalledHook {
         }
         setObjectField(attrObject, mP.snsAttrField, linkedList);
         v.put("attrBuf", encodeContentBlob(attrObject));
+    }
+
+    protected void log(String msg) {
+        if (mDebug) {
+            XposedBridge.log(msg);
+        }
+    }
+
+    protected void log(Throwable t) {
+        if (mDebug) {
+            XposedBridge.log(t);
+        }
     }
 }
