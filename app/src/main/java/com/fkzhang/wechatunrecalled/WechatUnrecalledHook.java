@@ -109,7 +109,6 @@ public class WechatUnrecalledHook {
                 mP.snsMethod, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        log("hooked in wechat sns");
                         init(loader);
                         if (mSnsSQL == null) {
                             mSnsSQL = param.args[0];
@@ -176,10 +175,6 @@ public class WechatUnrecalledHook {
                             return;
 
                         String s = ((String) param.args[0]).toLowerCase();
-
-                        if (s.equalsIgnoreCase("snsinfo")) {
-                            log("" + param.args[2]);
-                        }
 
                         if (!s.equalsIgnoreCase("snscomment"))
                             return;
@@ -822,7 +817,6 @@ public class WechatUnrecalledHook {
     }
 
     protected void setSnsDeleteFlag(ContentValues v) {
-        log(v.toString());
         Object contentObject = decodeBlob(mSnsContentClass, v.getAsByteArray("content"));
         if (contentObject == null)
             return;
@@ -831,20 +825,10 @@ public class WechatUnrecalledHook {
 
         content = mSettings.getString("deleted", "[已删除]") + "\n" + content;
         setObjectField(contentObject, mP.snsContentField, content);
-        log(content);
 
         ContentValues c = new ContentValues();
         c.put("content", encodeContentBlob(contentObject));
-//        if (v.getAsInteger("sourceType") != 0) {
         c.put("sourceType", 10);
-//        }
-//        log(c.toString());
-
-        String query = "SELECT sourceType FROM SnsInfo WHERE snsId = '" + v.getAsString("snsId") + "'";
-        Cursor cursor = rawQuerySns(query);
-        XposedUtil.inspectCursor(cursor);
-        cursor.close();
-
 
         updateSns("SnsInfo", c, "snsId = ?", new String[]{v.getAsString("snsId")});
     }
