@@ -17,4 +17,5 @@
     <string name="deleted">[Deleted]</string>
     <string name="prevent_moments_recall">Prevent moments recall</string>
     <string name="prevent_comments_recall">Prevent comments recall</string>
+    <string name="reply">Reply</string>
 </resources>

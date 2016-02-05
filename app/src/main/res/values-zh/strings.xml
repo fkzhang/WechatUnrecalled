@@ -17,4 +17,5 @@
     <string name="deleted">[已删除]</string>
     <string name="prevent_comments_recall">防止朋友圈撤回</string>
     <string name="prevent_moments_recall">防止评论撤回</string>
+    <string name="reply">回复</string>
 </resources>

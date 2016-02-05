@@ -37,6 +37,10 @@ public class WechatPackageNames {
     public String snsLuckyMoneyBlur;
     public String snsLuckyMoneyOrignal;
     public String snsLuckyMoneyClass2;
+    public String storageClass1;
+    public String storageMethod1;
+    public String msgCountMethod1;
+    public String msgCountMethod2;
 
     public WechatPackageNames(String packageName, String versionName) {
         this.packageName = packageName;
@@ -51,6 +55,8 @@ public class WechatPackageNames {
             set639();
         } else if (versionName.contains("6.3.8")) {
             set638();
+        } else if (versionName.contains("6.3.7")) {
+            set637();
         } else if (versionName.contains("6.3.5")) {
             set635();
         } else if (versionName.contains("6.3.0")) {
@@ -59,6 +65,8 @@ public class WechatPackageNames {
             set625();
         } else if (versionName.contains("6.0.0")) {
             set600();
+        } else if (versionName.contains("6.0.2.58")) {
+            set602_58();
         }
     }
 
@@ -67,12 +75,12 @@ public class WechatPackageNames {
         recallMethod = "D";
         snsClass += "d.g";
         snsMethod += "g.af";
-        dbClass1 += "bh";
+        dbClass1 += "bh"; // look for: ("message")
         dbMethod1 = "sS";
         dbMethod2 = "qQ";
         dbField = "dGo";
         contextGetter += "ai";
-        iconClass += ".booter.notification.a.d";
+        iconClass += ".booter.notification.a.d"; // look for: sdk < 19
         iconMethod = "mX";
         imageClass += ".z.ar";
         imageMethod1 = "zZ";
@@ -88,6 +96,42 @@ public class WechatPackageNames {
         snsAttrClass += "abb";
         snsAttrField = "iWH";
         commentTimeField = "iuc";
+        storageClass1 += "ay";
+        storageMethod1 += ".at.h";
+        msgCountMethod1 = "Cv";
+        msgCountMethod2 = "aSC";
+    }
+
+    private void set602_58() {
+        recallClass += "n";
+        recallMethod = "B";
+        snsClass += "e.l";
+        snsMethod += ".g.ae";
+        dbClass1 += "au";
+        dbMethod1 = "Cr";
+        dbMethod2 = "Am";
+        dbField = "esg";
+        contextGetter += "x";
+        iconClass += ".booter.notification.a.c";
+        iconMethod = "wr";
+        imageClass += ".y.af";
+        imageMethod1 = "JA";
+        imageMethod2 = "h";
+        avatarClass += ".p.u";
+        avatarMethod1 = "Eu";
+        avatarMethod2 = "b";
+        commentClass += "adb";
+        blobDecodeMethod = "v";
+        commentContentField = "gMw";
+        snsContentClass += "agc";
+        snsContentField = "kek";
+        snsAttrClass += "adm";
+        snsAttrField = "kbJ";
+        commentTimeField = "gJB";
+        storageClass1 += "ap";
+        storageMethod1 += ".ap.g";
+        msgCountMethod1 = "ER";
+        msgCountMethod2 = "bjt";
     }
 
     private void set625() {
@@ -175,6 +219,35 @@ public class WechatPackageNames {
         snsAttrClass += "amj";
         snsAttrField = "iGC";
         commentTimeField = "eKt";
+    }
+
+    private void set637() {
+        recallClass += "r";
+        recallMethod = "H";
+        snsClass += "h.l";
+        snsMethod += "g.d";
+        dbClass1 += "ah";
+        dbMethod1 = "tn";
+        dbMethod2 = "rk";
+        dbField = "bvh";
+        updateMsgId = "aRo";
+        contextGetter += "z";
+        iconClass += ".an.a";
+        iconMethod = "aHx";
+        imageClass += ".z.n";
+        imageMethod1 = "zW";
+        imageMethod2 = "hy";
+        avatarClass += ".p.n";
+        avatarMethod1 = "vh";
+        avatarMethod2 = "b";
+        commentClass += "anr";
+        blobDecodeMethod = "ak";
+        commentContentField = "eVT";
+        snsContentClass += "aqx";
+        snsContentField = "iXe";
+        snsAttrClass += "aod";
+        snsAttrField = "iUS";
+        commentTimeField = "eSX";
     }
 
     private void set638() {
@@ -310,5 +383,9 @@ public class WechatPackageNames {
         snsLuckyMoneyOrignal = "";
         snsLuckyMoneyBlur = "";
         snsLuckyMoneyClass2 = packageName + ".protocal.b.";
+        storageClass1 = packageName + ".storage.";
+        storageMethod1 = packageName;
+        msgCountMethod1 = "";
+        msgCountMethod2 = "";
     }
 }

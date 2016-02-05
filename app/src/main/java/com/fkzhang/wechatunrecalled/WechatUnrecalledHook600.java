@@ -1,11 +1,8 @@
 package com.fkzhang.wechatunrecalled;
 
-import android.content.ContentValues;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
-
-import java.util.Random;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -19,7 +16,7 @@ import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
  */
 public class WechatUnrecalledHook600 extends WechatUnrecalledHook {
 
-    private Object mStorageObject;
+    protected Object mStorageObject;
 
     public WechatUnrecalledHook600(WechatPackageNames packageNames) {
         super(packageNames);
@@ -68,34 +65,16 @@ public class WechatUnrecalledHook600 extends WechatUnrecalledHook {
     }
 
     protected void hookStorageObject(final ClassLoader loader) {
-        findAndHookConstructor(mP.packageName + ".storage.ay", loader,
-                mP.packageName + ".at.h", new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        mStorageObject = param.thisObject;
-                    }
-                });
-    }
-
-    protected void insertMessage(String talker, int talkerId, String msg, long createTime) {
-        int type = 10000;
-        int status = 3;
-        long msgSvrId = createTime + (new Random().nextInt());
-        long msgId = getNextMsgId();
-        ContentValues v = new ContentValues();
-        v.put("msgid", msgId);
-        v.put("msgSvrid", msgSvrId);
-        v.put("type", type);
-        v.put("status", status);
-        v.put("createTime", createTime);
-        v.put("talker", talker);
-        v.put("content", msg);
-        insertSQL("message", "", v);
-        updateMessageCount();
+        findAndHookConstructor(mP.storageClass1, loader, mP.storageMethod1, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                mStorageObject = param.thisObject;
+            }
+        });
     }
 
     protected void updateMessageCount() {
-        callMethod(callMethod(mStorageObject, "Cv", "message"), "aSC");
+        callMethod(callMethod(mStorageObject, mP.msgCountMethod1, "message"), mP.msgCountMethod2);
     }
 
     protected Bitmap getImage(String path) {

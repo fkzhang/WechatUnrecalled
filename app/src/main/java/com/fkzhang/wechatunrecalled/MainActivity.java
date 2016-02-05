@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         mSettingsHelper.setString("recalled_img_summary", getString(R.string.recalled_img_summary));
         mSettingsHelper.setString("recalled_video_summary", getString(R.string.recalled_video_summary));
         mSettingsHelper.setString("new_comment", getString(R.string.new_comment));
+        mSettingsHelper.setString("reply", getString(R.string.reply));
 
     }
 
