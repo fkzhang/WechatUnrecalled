@@ -12,12 +12,11 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.fkzhang.wechatunrecalled.WechatPackageNames;
 
 import java.util.ArrayList;
-
-import de.robv.android.xposed.XposedBridge;
 
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 
@@ -43,7 +42,7 @@ public class NotificationHelper {
 
     //-- comment notification ======================================================================
 
-    public void displayNewCommentNotification(String username, String title, String content,
+    public void displayNewCommentNotification(String title, String content,
                                               Bitmap icon, Intent intent) {
         if (TextUtils.isEmpty(content))
             return;
@@ -51,41 +50,22 @@ public class NotificationHelper {
         if (!mSettings.getBoolean("enable_new_comment_notification", true)) {
             return;
         }
-        Bitmap largeIcon = icon == null ? getLargeIcon() : icon;
 
-        showCommentNotification(title, content, largeIcon, username, intent);
+        showCommentNotification(title, content, icon, intent);
     }
 
     public void showCommentNotification(String contentTitle, String contentText,
-                                        Bitmap icon, String username, Intent resultIntent) {
+                                        Bitmap icon, Intent resultIntent) {
+
+        Bitmap largeIcon = icon == null ? getLargeIcon() : icon;
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mNotificationContext)
-                        .setLargeIcon(icon)
+                        .setLargeIcon(largeIcon)
                         .setSmallIcon(mNotificationIcon)
                         .setContentTitle(contentTitle)
                         .setContentText(contentText)
                         .setAutoCancel(true);
-
-
-//        resultIntent = new Intent();
-//        resultIntent.setClassName(mNotificationContext.getPackageName(),
-//                w.packageName + ".plugin.sns.ui.SnsMsgUI");
-
-//        TaskStackBuilder stackBuilder;
-//        stackBuilder = TaskStackBuilder.create(mNotificationContext);
-//        stackBuilder.addParentStack(mNotificationClass);
-////        stackBuilder.addParentStack(findClass(parentStack, mLoader));
-//
-//        stackBuilder.addNextIntent(resultIntent);
-//        PendingIntent resultPendingIntent =
-//                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-//        mBuilder.setContentIntent(resultPendingIntent);
-//
-//        XposedBridge.log(resultIntent.toString());
-
-
-//        XposedBridge.log(resultIntent.toString());
-//        XposedBridge.log(resultIntent.getExtras().toString());
 
         int notifyId = getNotificationId();
 
@@ -170,10 +150,9 @@ public class NotificationHelper {
     }
 
     protected void showNotification(NotificationCompat.Builder builder, Intent intent) {
-        XposedBridge.log(intent.toString());
-
         int notifyId = getNotificationId();
-        builder.setContentIntent(PendingIntent.getActivity(mNotificationContext, notifyId, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+        builder.setContentIntent(PendingIntent.getActivity(mNotificationContext, notifyId, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT));
         Notification notification = builder.build();
         notification.flags = Notification.FLAG_ONLY_ALERT_ONCE | Notification.FLAG_SHOW_LIGHTS
                 | Notification.FLAG_AUTO_CANCEL;
@@ -346,5 +325,18 @@ public class NotificationHelper {
         }
     }
 
+    public void showToast(String msg) {
+        if (TextUtils.isEmpty(msg) || mNotificationContext == null)
+            return;
+
+        Toast.makeText(mNotificationContext, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    public void showToastLong(String msg) {
+        if (TextUtils.isEmpty(msg) || mNotificationContext == null)
+            return;
+
+        Toast.makeText(mNotificationContext, msg, Toast.LENGTH_LONG).show();
+    }
 }
 

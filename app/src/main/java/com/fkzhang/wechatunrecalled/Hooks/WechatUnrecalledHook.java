@@ -326,7 +326,7 @@ public class WechatUnrecalledHook {
                         intent.putExtra("INTENT_FROMSUI", true);
                         intent.putExtra("INTENT_FROMSUI_COMMENTID", v.getAsLong("commentSvrID"));
 
-                        mNotificationHelper.displayNewCommentNotification(talker, title, content, icon, intent);
+                        mNotificationHelper.displayNewCommentNotification(title, content, icon, intent);
                     }
                 });
 
@@ -623,7 +623,7 @@ public class WechatUnrecalledHook {
             Intent resultIntent = new Intent();
             resultIntent.setClassName(mNotificationContext.getPackageName(), w.SnsMsgUI);
 
-            mNotificationHelper.displayNewCommentNotification(talker, title, content, icon, resultIntent);
+            mNotificationHelper.displayNewCommentNotification(title, content, icon, resultIntent);
         }
     }
 
@@ -980,7 +980,6 @@ public class WechatUnrecalledHook {
             XposedBridge.log(t);
         }
     }
-
 
     public String getEmojiText(String nickname, String imgPath) {
         String emoji = mSettings.getString("emoji", "[动画表情]");
