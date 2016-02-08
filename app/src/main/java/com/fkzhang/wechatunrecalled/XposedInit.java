@@ -4,6 +4,10 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.SparseArray;
 
+import com.fkzhang.wechatunrecalled.Hooks.WechatUnrecalledHook;
+import com.fkzhang.wechatunrecalled.Hooks.WechatUnrecalledHook600;
+import com.fkzhang.wechatunrecalled.Hooks.WechatUnrecalledHook602_58;
+
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;

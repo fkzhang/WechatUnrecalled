@@ -12,7 +12,6 @@ public class WechatPackageNames {
     public String snsMethod;
     public String dbClass1;
     public String dbMethod1;
-    public String dbField;
     public String dbMethod2;
     public String updateMsgId;
     public String contextGetter;
@@ -32,7 +31,7 @@ public class WechatPackageNames {
     public String snsContentField;
     public String luckyRevealImageView;
     public String snsAttrClass;
-    public String snsAttrField;
+    public String commentsListField;
     public String snsLuckyMoneyClass1;
     public String snsLuckyMoneyBlur;
     public String snsLuckyMoneyOrignal;
@@ -41,6 +40,31 @@ public class WechatPackageNames {
     public String storageMethod1;
     public String msgCountMethod1;
     public String msgCountMethod2;
+    public String emojiClass;
+    public String emojiMethod1;
+    public String ChattingUI;
+    public String snsCommentDetailUI;
+    public String ImageGalleryUI;
+    public String SnsMsgUI;
+    public String launcherUI;
+    public String notificationClass;
+    public String dexFile;
+    public String snsLuckyMoneyBlur2;
+    public String snsLuckyMoneyBitmapDecoder;
+    public String snsLuckyMoneySetBitmapMethod;
+    public String snsLuckyMoneyMethod1;
+    public String snsLuckyMoneyWantSeePhotoUIConstructor;
+    public String snsLuckyMoneyWantSeePhotoUI;
+    public String snsLuckyMoneyButton;
+    public String snsLuckyMoneyBanner;
+    public String snsLuckyMoneyBannerImageView;
+    public String snsLuckyMoneyBannerTextView;
+    public String snsLuckyMoneyBannerView1;
+    public String snsLuckyMoneyBannerView2;
+    public String snsLuckyMoneyRevealBigpicture;
+    public String snsLuckyMoneyClass3;
+    public String snsLuckyMoneyClass4;
+    public String SQLiteDatabaseClass;
 
     public WechatPackageNames(String packageName, String versionName) {
         this.packageName = packageName;
@@ -78,7 +102,6 @@ public class WechatPackageNames {
         dbClass1 += "bh"; // look for: ("message")
         dbMethod1 = "sS";
         dbMethod2 = "qQ";
-        dbField = "dGo";
         contextGetter += "ai";
         iconClass += ".booter.notification.a.d"; // look for: sdk < 19
         iconMethod = "mX";
@@ -94,12 +117,14 @@ public class WechatPackageNames {
         snsContentClass += "adq";
         snsContentField = "iZr";
         snsAttrClass += "abb";
-        snsAttrField = "iWH";
+        commentsListField = "iWH";
         commentTimeField = "iuc";
         storageClass1 += "ay";
         storageMethod1 += ".at.h";
         msgCountMethod1 = "Cv";
         msgCountMethod2 = "aSC";
+        notificationClass += "u";
+
     }
 
     private void set602_58() {
@@ -110,7 +135,6 @@ public class WechatPackageNames {
         dbClass1 += "au";
         dbMethod1 = "Cr";
         dbMethod2 = "Am";
-        dbField = "esg";
         contextGetter += "x";
         iconClass += ".booter.notification.a.c";
         iconMethod = "wr";
@@ -126,12 +150,13 @@ public class WechatPackageNames {
         snsContentClass += "agc";
         snsContentField = "kek";
         snsAttrClass += "adm";
-        snsAttrField = "kbJ";
+        commentsListField = "kbJ";
         commentTimeField = "gJB";
         storageClass1 += "ap";
         storageMethod1 += ".ap.g";
         msgCountMethod1 = "ER";
         msgCountMethod2 = "bjt";
+        notificationClass += "t";
     }
 
     private void set625() {
@@ -142,7 +167,6 @@ public class WechatPackageNames {
         dbClass1 += "ah";
         dbMethod1 = "tI";
         dbMethod2 = "rG";
-        dbField = "bvg";
         updateMsgId = "aNG";
         contextGetter += "x";
         iconClass += ".am.a";
@@ -159,8 +183,13 @@ public class WechatPackageNames {
         snsContentClass += "aok";
         snsContentField = "ixy";
         snsAttrClass += "alr";
-        snsAttrField = "ivq";
+        commentsListField = "ivq";
         commentTimeField = "eDv";
+        notificationClass += "e.1";
+        emojiClass += "c"; // look for main_conversation_chatroom_unread_digest
+        emojiMethod1 = "Dw";
+        storageClass1 += "h";
+        storageMethod1 += ".av.g";
     }
 
     private void set630() {
@@ -171,7 +200,6 @@ public class WechatPackageNames {
         dbClass1 += "ah";
         dbMethod1 = "tL";
         dbMethod2 = "rJ";
-        dbField = "bts";
         updateMsgId = "aPp";
         contextGetter += "y";
         iconClass += ".an.a";
@@ -188,8 +216,13 @@ public class WechatPackageNames {
         snsContentClass += "apb";
         snsContentField = "iIM";
         snsAttrClass += "amj";
-        snsAttrField = "iGA";
+        commentsListField = "iGA";
         commentTimeField = "eKp";
+        notificationClass += "e.1";
+        emojiClass += "d"; // look for main_conversation_chatroom_unread_digest
+        emojiMethod1 = "DK";
+        storageClass1 += "h";
+        storageMethod1 += ".aw.g";
     }
 
     private void set635() {
@@ -200,7 +233,6 @@ public class WechatPackageNames {
         dbClass1 += "ai";
         dbMethod1 = "tO";
         dbMethod2 = "rM";
-        dbField = "bts";
         updateMsgId = "aPy";
         contextGetter += "y";
         iconClass += ".an.a";
@@ -217,8 +249,13 @@ public class WechatPackageNames {
         snsContentClass += "apb";
         snsContentField = "iIO";
         snsAttrClass += "amj";
-        snsAttrField = "iGC";
+        commentsListField = "iGC";
         commentTimeField = "eKt";
+        notificationClass += "e.1";
+        emojiClass += "c"; // look for main_conversation_chatroom_unread_digest
+        emojiMethod1 = "DL";
+        storageClass1 += "h";
+        storageMethod1 += ".aw.g";
     }
 
     private void set637() {
@@ -229,7 +266,6 @@ public class WechatPackageNames {
         dbClass1 += "ah";
         dbMethod1 = "tn";
         dbMethod2 = "rk";
-        dbField = "bvh";
         updateMsgId = "aRo";
         contextGetter += "z";
         iconClass += ".an.a";
@@ -246,8 +282,13 @@ public class WechatPackageNames {
         snsContentClass += "aqx";
         snsContentField = "iXe";
         snsAttrClass += "aod";
-        snsAttrField = "iUS";
+        commentsListField = "iUS";
         commentTimeField = "eSX";
+        notificationClass += "b$1";
+        emojiClass += "d"; // look for main_conversation_chatroom_unread_digest
+        emojiMethod1 = "EX";
+        storageClass1 += "h";
+        storageMethod1 += ".aw.g";
     }
 
     private void set638() {
@@ -258,7 +299,6 @@ public class WechatPackageNames {
         dbClass1 += "ah";
         dbMethod1 = "tl";
         dbMethod2 = "rj";
-        dbField = "bww";
         updateMsgId = "aTT";
         contextGetter += "z";
         iconClass += ".an.a";
@@ -275,8 +315,13 @@ public class WechatPackageNames {
         snsContentClass += "asd";
         snsContentField = "jjP";
         snsAttrClass += "apc";
-        snsAttrField = "jhw";
+        commentsListField = "jhw";
         commentTimeField = "faB";
+        notificationClass += "b$1";
+        emojiClass += "d"; // look for main_conversation_chatroom_unread_digest
+        emojiMethod1 = "FM";
+        storageClass1 += "h";
+        storageMethod1 += ".aw.g";
     }
 
     private void set639() {
@@ -287,7 +332,6 @@ public class WechatPackageNames {
         dbClass1 += "ah";
         dbMethod1 = "tr";
         dbMethod2 = "rk";
-        dbField = "bzj";
         updateMsgId = "aVP";
         contextGetter += "y";
         iconClass += ".ap.a";
@@ -304,10 +348,15 @@ public class WechatPackageNames {
         snsContentClass += "asz";
         snsContentField = "jBA";
         snsAttrClass += "apw";
-        snsAttrField = "jzc";
+        commentsListField = "jzc";
         commentTimeField = "fjz";
         luckyRevealImageView = this.packageName +
                 ".plugin.sns.lucky.ui.LuckyRevealImageView";
+        notificationClass += "b$1";
+        emojiClass += "c"; // look for main_conversation_chatroom_unread_digest
+        emojiMethod1 = "GC";
+        storageClass1 += "h";
+        storageMethod1 += ".ay.g";
     }
 
 
@@ -319,7 +368,6 @@ public class WechatPackageNames {
         dbClass1 += "ah";
         dbMethod1 = "tD";
         dbMethod2 = "rs";
-        dbField = "bCw";// look for: ah.tD().rs() or in com.tencent.mm.storage.ah
         updateMsgId = "aXP";
         contextGetter += "y";
         iconClass += ".aq.a";
@@ -336,19 +384,42 @@ public class WechatPackageNames {
         snsContentClass += "atp";
         snsContentField = "jMu";
         snsAttrClass += "aqi";
-        snsAttrField = "jJX";
+        commentsListField = "jJX";
         commentTimeField = "fpL";
         luckyRevealImageView = this.packageName +
                 ".plugin.sns.lucky.ui.LuckyRevealImageView";
+        emojiClass += "d"; // look for main_conversation_chatroom_unread_digest
+        emojiMethod1 = "Hl";
+        notificationClass += "b$1";
+        dexFile = "secondary-1";
+        storageClass1 += "h";
+        storageMethod1 += ".az.g";
+
+        snsLuckyMoneyClass1 = packageName + ".plugin.sns.data.h";
+        snsLuckyMoneyClass2 += "add";
+        snsLuckyMoneyOrignal = "b";
+        snsLuckyMoneyBlur = "g";
+        snsLuckyMoneyBlur2 = "e";
+
+        snsLuckyMoneyBitmapDecoder = "uk";
+        snsLuckyMoneySetBitmapMethod = "axU";
+        snsLuckyMoneyMethod1 = "b";
+        snsLuckyMoneyWantSeePhotoUIConstructor = "k";
+        snsLuckyMoneyWantSeePhotoUI = packageName + ".plugin.sns.lucky.ui.SnsLuckyMoneyWantSeePhotoUI";
+        snsLuckyMoneyButton = "dtX";
+        snsLuckyMoneyBanner = "gKu";
+        snsLuckyMoneyBannerImageView = "gKt";
+        snsLuckyMoneyBannerTextView = "gKv";
+        snsLuckyMoneyBannerView1 = "gKw";
+        snsLuckyMoneyBannerView2 = "gKx";
+        snsLuckyMoneyClass3 += "c.b";
+        snsLuckyMoneyClass4 += "d.ac";
+        snsLuckyMoneyRevealBigpicture = "getOriginBigBitmapFilePath";
     }
 
     private void set6313() {
         set6311();
-        luckyRevealImageView = "";
-        snsLuckyMoneyClass1 = packageName + ".plugin.sns.data.h";
-        snsLuckyMoneyClass2 += "add";
-        snsLuckyMoneyOrignal = "h";
-        snsLuckyMoneyBlur = "g";
+        snsLuckyMoneyRevealBigpicture = "bpg";
     }
 
     private void initNames() {
@@ -359,7 +430,6 @@ public class WechatPackageNames {
         dbClass1 = this.packageName + ".model.";
         dbMethod1 = "";
         dbMethod2 = "";
-        dbField = "";
         updateMsgId = "";
         contextGetter = recallClass;
         iconClass = this.packageName;
@@ -377,7 +447,7 @@ public class WechatPackageNames {
         snsContentClass = commentClass;
         snsContentField = "";
         snsAttrClass = commentClass;
-        snsAttrField = "";
+        commentsListField = "";
         luckyRevealImageView = "";
         snsLuckyMoneyClass1 = "";
         snsLuckyMoneyOrignal = "";
@@ -387,5 +457,30 @@ public class WechatPackageNames {
         storageMethod1 = packageName;
         msgCountMethod1 = "";
         msgCountMethod2 = "";
+        emojiClass = packageName + ".ui.conversation.";
+        emojiMethod1 = "";
+        ChattingUI = packageName + ".ui.chatting.ChattingUI";
+        SnsMsgUI = packageName + ".plugin.sns.ui.SnsMsgUI";
+        ImageGalleryUI = packageName + ".ui.chatting.gallery.ImageGalleryUI";
+        snsCommentDetailUI = packageName + ".plugin.sns.ui.SnsCommentDetailUI";
+        launcherUI = this.packageName + ".ui.LauncherUI";
+        notificationClass = packageName + ".booter.notification.";
+        dexFile = "";
+        snsLuckyMoneyBlur2 = "";
+        snsLuckyMoneyBitmapDecoder = "";
+        snsLuckyMoneySetBitmapMethod = "";
+        snsLuckyMoneyMethod1 = "";
+        snsLuckyMoneyWantSeePhotoUIConstructor = "";
+        snsLuckyMoneyWantSeePhotoUI = "";
+        snsLuckyMoneyButton = "";
+        snsLuckyMoneyBanner = "";
+        snsLuckyMoneyBannerImageView = "";
+        snsLuckyMoneyBannerTextView = "";
+        snsLuckyMoneyBannerView1 = "";
+        snsLuckyMoneyBannerView2 = "";
+        snsLuckyMoneyRevealBigpicture = "";
+        snsLuckyMoneyClass3 = packageName + ".plugin.sns.ui.";
+        snsLuckyMoneyClass4 = packageName + ".plugin.sns.";
+        SQLiteDatabaseClass = packageNameBase + ".kingkong.database.SQLiteDatabase";
     }
 }

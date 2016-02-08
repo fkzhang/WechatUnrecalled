@@ -7,7 +7,7 @@
     <string name="recalled_video_summary">[小视频] 点击查看</string>
     <string name="recalled_img_summary">[图片] 点击查看</string>
     <string name="recalled_message">撤回消息</string>
-    <string name="recalled_msg_content">(已阻止)</string>
+    <string name="recalled_msg_content">尝试撤回上一条消息 （已阻止)</string>
     <string name="comment_recall_content">尝试删除一条评论</string>
     <string name="comment_recalled_message">评论删除消息</string>
     <string name="enable_notification">开启消息撤回通知</string>
@@ -18,4 +18,21 @@
     <string name="prevent_comments_recall">防止朋友圈撤回</string>
     <string name="prevent_moments_recall">防止评论撤回</string>
     <string name="reply">回复</string>
+    <string name="audio">[语音]</string>
+    <string name="customization">自定义消息</string>
+    <string name="customize_notification">自定义通知</string>
+    <string name="default_text">跟随系统</string>
+    <string name="emoji">[动画表情]</string>
+    <string name="enable_custom_notification">开启自定义通知</string>
+    <string name="enable_ringtone">开启铃声</string>
+    <string name="enable_vibrate">开启震动</string>
+    <string name="notification">通知</string>
+    <string name="prevent_recall">防止撤回</string>
+    <string name="ringtone_selection">选择铃声</string>
+    <string name="select_ringtone">选择铃声</string>
+    <string name="alipay">支付宝</string>
+    <string name="wechat">微信</string>
+    <string name="support">如果喜欢我的作品，想支持我点这里</string>
+    <string name="snslucky">查看红包照片 (试验 有时无效 如有冲突请关闭)</string>
+    <string name="share_image">分享图片</string>
 </resources>

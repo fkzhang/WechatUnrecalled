@@ -1,11 +1,15 @@
-package com.fkzhang.wechatunrecalled;
+package com.fkzhang.wechatunrecalled.Hooks;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 
+import com.fkzhang.wechatunrecalled.Util.WechatMainDBHelper;
+import com.fkzhang.wechatunrecalled.WechatPackageNames;
+
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
@@ -34,7 +38,7 @@ public class WechatUnrecalledHook600 extends WechatUnrecalledHook {
             XposedBridge.log(e);
         }
         try {
-            hookStorageObject(loader);
+            hookDbObject(loader);
         } catch (Exception e) {
             XposedBridge.log(e);
         }
@@ -45,7 +49,7 @@ public class WechatUnrecalledHook600 extends WechatUnrecalledHook {
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                             String dexPath = (String) param.args[0];
                             ClassLoader classLoader = (ClassLoader) param.thisObject;
-                            if (dexPath.contains(mP.packageName + ".plugin.mutidex")) {
+                            if (dexPath.contains(w.packageName + ".plugin.mutidex")) {
                                 try {
                                     hookSns(classLoader);
                                 } catch (Exception e) {
@@ -64,25 +68,55 @@ public class WechatUnrecalledHook600 extends WechatUnrecalledHook {
         }
     }
 
-    protected void hookStorageObject(final ClassLoader loader) {
-        findAndHookConstructor(mP.storageClass1, loader, mP.storageMethod1, new XC_MethodHook() {
+    protected void hookNotification(final ClassLoader loader) {
+        // notification
+        XposedHelpers.findAndHookMethod(w.notificationClass, loader,
+                "a", w.packageName + ".booter.u", String.class, String.class, int.class,
+                int.class, boolean.class,
+                new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+
+                        String talker = (String) param.args[1];
+                        String content = (String) param.args[2];
+                        int type = (int) param.args[3];
+
+                        displayNotification(param, talker, content, type);
+
+                    }
+                });
+    }
+
+    protected void hookDbObject(final ClassLoader loader) {
+        findAndHookConstructor(w.storageClass1, loader, w.storageMethod1, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 mStorageObject = param.thisObject;
+                init(loader);
+                if (mDb == null) {
+                    try {
+                        mDb = new WechatMainDBHelper(param.args[0]);
+                        mNotificationHelper.setDB(mDb);
+                    } catch (Throwable t) {
+                        log(t);
+                    }
+                }
             }
         });
     }
 
     protected void updateMessageCount() {
-        callMethod(callMethod(mStorageObject, mP.msgCountMethod1, "message"), mP.msgCountMethod2);
+        callMethod(callMethod(mStorageObject, w.msgCountMethod1, "message"), w.msgCountMethod2);
     }
 
     protected Bitmap getImage(String path) {
         String str = null;
         try {
-            str = (String) callMethod(callStaticMethod(mImgClss, mP.imageMethod1),
-                    mP.imageMethod2, path, "", "");
+            str = (String) callMethod(callStaticMethod(mImgClss, w.imageMethod1),
+                    w.imageMethod2, path, "", "");
         } catch (Exception e) {
+            XposedBridge.log(e);
         }
 
         if (TextUtils.isEmpty(str))

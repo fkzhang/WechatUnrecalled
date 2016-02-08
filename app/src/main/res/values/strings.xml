@@ -8,7 +8,7 @@
     <string name="recalled_img_summary">View in full screen mode</string>
     <string name="recalled_video_summary">[Video] View in full screen mode</string>
     <string name="recalled_message">recalled message</string>
-    <string name="recalled_msg_content">(Prevented)</string>
+    <string name="recalled_msg_content">tried to recall above message (Prevented)</string>
     <string name="comment_recalled_message">comment recalled message</string>
     <string name="comment_recall_content">tried to delete a comment</string>
     <string name="enable_comment_recall_notification">Enable comment recall notification</string>
@@ -18,4 +18,21 @@
     <string name="prevent_moments_recall">Prevent moments recall</string>
     <string name="prevent_comments_recall">Prevent comments recall</string>
     <string name="reply">Reply</string>
+    <string name="emoji">[Emoji]</string>
+    <string name="audio">[Audio]</string>
+    <string name="prevent_recall">Prevent recall</string>
+    <string name="notification">Notification</string>
+    <string name="customization">Customize message</string>
+    <string name="enable_custom_notification">Enable custom notification</string>
+    <string name="customize_notification">Customize notification</string>
+    <string name="enable_vibrate">Enable vibration</string>
+    <string name="enable_ringtone">Enable ringtone</string>
+    <string name="select_ringtone">Select ringtone</string>
+    <string name="default_text">Default ringtone</string>
+    <string name="ringtone_selection">Select ringtone</string>
+    <string name="support">If you like my work and want to support me, click here</string>
+    <string name="wechat">Wechat</string>
+    <string name="alipay">Alipay</string>
+    <string name="snslucky">Show luckymoney moments unblured image (Experimental)</string>
+    <string name="share_image">Share image</string>
 </resources>

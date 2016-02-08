@@ -25,6 +25,42 @@
             android:orientation="vertical">
 
 
+            <TextView
+                android:id="@+id/textView0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="@string/support"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prevent_recall"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <Switch
+                android:id="@+id/enable_moment_recall_prevention"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/prevent_moments_recall" />
+
+            <Switch
+                android:id="@+id/enable_comment_recall_prevention"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/prevent_comments_recall" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/notification"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
             <Switch
                 android:id="@+id/enable_recall_notification"
                 android:layout_width="match_parent"
@@ -53,19 +89,58 @@
                 android:padding="15dp"
                 android:text="@string/show_content" />
 
-            <Switch
-                android:id="@+id/enable_moment_recall_prevention"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:text="@string/prevent_moments_recall" />
+                android:text="@string/customize_notification"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <Switch
-                android:id="@+id/enable_comment_recall_prevention"
+                android:id="@+id/enable_custom_notification"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="15dp"
-                android:text="@string/prevent_comments_recall" />
+                android:text="@string/enable_custom_notification" />
+
+
+            <Switch
+                android:id="@+id/vibrate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/enable_vibrate" />
+
+            <Switch
+                android:id="@+id/ringtone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/enable_ringtone" />
+
+            <TextView
+                android:id="@+id/ringtone_select"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/select_ringtone"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/ringtone_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/default_text"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/customization"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <EditText
                 android:id="@+id/editText"
@@ -80,6 +155,13 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/comment_recalled_message"
                 android:padding="15dp" />
+
+            <Switch
+                android:id="@+id/snslucky"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/snslucky" />
         </LinearLayout>
 
 
