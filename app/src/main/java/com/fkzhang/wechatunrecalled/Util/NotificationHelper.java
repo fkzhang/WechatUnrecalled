@@ -41,21 +41,10 @@ public class NotificationHelper {
     }
 
     //-- comment notification ======================================================================
-
-    public void displayNewCommentNotification(String title, String content,
-                                              Bitmap icon, Intent intent) {
-        if (TextUtils.isEmpty(content))
-            return;
-
-        if (!mSettings.getBoolean("enable_new_comment_notification", true)) {
-            return;
-        }
-
-        showCommentNotification(title, content, icon, intent);
-    }
-
     public void showCommentNotification(String contentTitle, String contentText,
-                                        Bitmap icon, Intent resultIntent) {
+                                        Bitmap icon, Intent resultIntent, String tag) {
+        if (TextUtils.isEmpty(contentText))
+            return;
 
         Bitmap largeIcon = icon == null ? getLargeIcon() : icon;
 
@@ -82,8 +71,8 @@ public class NotificationHelper {
         notification.ledOffMS = 1000;
         notification.ledARGB = Color.GREEN;
 
-        setNotificationVibrate(notification);
-        setNotificationSound(notification);
+        setNotificationVibrate(tag, notification);
+        setNotificationSound(tag, notification);
 
         notifyNotification(notification, notifyId);
     }
@@ -101,7 +90,7 @@ public class NotificationHelper {
         if (!TextUtils.isEmpty(content)) {
             builder.setContentText(content);
         }
-        showNotification(builder, getChatModeIntent(username));
+        showNotification(builder, getChatModeIntent(username), getNotificationId());
     }
 
 
@@ -121,11 +110,11 @@ public class NotificationHelper {
             builder.setContentText(summary);
         }
 
-        setActionIntent(username, builder);
-
+        int notifyId = getNotificationId();
+        setActionIntent(username, builder, notifyId);
         resultIntent.setClassName(mNotificationContext.getPackageName(), w.ImageGalleryUI);
 
-        showNotification(builder, resultIntent);
+        showNotification(builder, resultIntent, notifyId);
     }
 
     public void showEmojiNotification(String title, Bitmap bitmap, Intent resultIntent,
@@ -146,20 +135,22 @@ public class NotificationHelper {
 
         resultIntent.setClassName(mNotificationContext.getPackageName(), w.ChattingUI);
 
-        showNotification(builder, resultIntent);
+        showNotification(builder, resultIntent, getNotificationId());
     }
 
-    protected void showNotification(NotificationCompat.Builder builder, Intent intent) {
-        int notifyId = getNotificationId();
+    protected void showNotification(NotificationCompat.Builder builder, Intent intent, int notifyId) {
         builder.setContentIntent(PendingIntent.getActivity(mNotificationContext, notifyId, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT));
         Notification notification = builder.build();
-        notification.flags = Notification.FLAG_ONLY_ALERT_ONCE | Notification.FLAG_SHOW_LIGHTS
-                | Notification.FLAG_AUTO_CANCEL;
+        notification.flags = Notification.FLAG_SHOW_LIGHTS | Notification.FLAG_AUTO_CANCEL;
 
         notification.ledOnMS = 300;
         notification.ledOffMS = 1000;
         notification.ledARGB = Color.GREEN;
+
+        String tag = "msg_recall";
+        setNotificationVibrate(tag, notification);
+        setNotificationSound(tag, notification);
 
         notifyNotification(notification, notifyId);
     }
@@ -187,16 +178,17 @@ public class NotificationHelper {
                     .bigPicture(bitmap).setSummaryText(content));
         }
 
+        int notifyId = mUsernames.indexOf(username);
+
 //        Intent intent = new Intent();
         if (type == 3 || type == 62) {
-            setActionIntent(username, mBuilder);
+            setActionIntent(username, mBuilder, notifyId);
         }
 
         if (!mUsernames.contains(username)) {
             mUsernames.add(username);
         }
 
-        int notifyId = mUsernames.indexOf(username);
 
         mBuilder.setContentIntent(PendingIntent.getActivity(mNotificationContext, notifyId, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT));
@@ -210,8 +202,9 @@ public class NotificationHelper {
         notification.ledOffMS = 1000;
         notification.ledARGB = Color.GREEN;
 
-        setNotificationVibrate(notification);
-        setNotificationSound(notification);
+        String tag = "custom";
+        setNotificationVibrate(tag, notification);
+        setNotificationSound(tag, notification);
 
         notifyNotification(notification, notifyId);
     }
@@ -285,9 +278,10 @@ public class NotificationHelper {
         return mNotificationLargeIcon;
     }
 
-    private void setActionIntent(String username, NotificationCompat.Builder builder) {
+    private void setActionIntent(String username, NotificationCompat.Builder builder, int id) {
         Intent action = getChatModeIntent(username);
-        PendingIntent pendingIntent = PendingIntent.getActivity(mNotificationContext, 0, action, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(mNotificationContext, id, action,
+                PendingIntent.FLAG_UPDATE_CURRENT);
         builder.addAction(android.R.drawable.sym_action_chat, mSettings.getString("reply", "回复"), pendingIntent);
     }
 
@@ -305,23 +299,20 @@ public class NotificationHelper {
         return intent;
     }
 
-    protected void setNotificationSound(Notification notification, String uriString) {
-        if (!TextUtils.isEmpty(uriString)) {
-            notification.sound = Uri.parse(uriString);
-        } else {
-            notification.defaults |= Notification.DEFAULT_SOUND;
-        }
-    }
-
-    protected void setNotificationVibrate(Notification notification) {
-        if (mSettings.getBoolean("custom_vibrate_enable", false)) {
+    protected void setNotificationVibrate(String tag, Notification notification) {
+        if (mSettings.getBoolean(tag + "_vibrate_enable", false)) {
             notification.defaults |= Notification.DEFAULT_VIBRATE;
         }
     }
 
-    protected void setNotificationSound(Notification notification) {
-        if (mSettings.getBoolean("custom_ringtone_enable", false)) {
-            setNotificationSound(notification, mSettings.getString("custom_ringtone", ""));
+    protected void setNotificationSound(String tag, Notification notification) {
+        if (mSettings.getBoolean(tag + "_ringtone_enable", false)) {
+            String uriString = mSettings.getString(tag + "_ringtone", "");
+            if (!TextUtils.isEmpty(uriString)) {
+                notification.sound = Uri.parse(uriString);
+            } else {
+                notification.defaults |= Notification.DEFAULT_SOUND;
+            }
         }
     }
 

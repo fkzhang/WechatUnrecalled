@@ -61,26 +61,38 @@
                 android:text="@string/notification"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <Switch
-                android:id="@+id/enable_recall_notification"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:text="@string/enable_notification" />
 
-            <Switch
-                android:id="@+id/enable_comment_recall_notification"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/replace_notification"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="15dp"
-                android:text="@string/enable_comment_recall_notification" />
+                android:text="@string/replace_wechat_notification"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <Switch
-                android:id="@+id/enable_new_comment_notification"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/customize_msg_recall_notification"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="15dp"
-                android:text="@string/enable_new_comment_notification" />
+                android:text="@string/customize_recall_notification"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/customize_comment_recall_notification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/customize_comment_recall_notification"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/customize_new_comment_notification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/customize_new_comment_notification"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <Switch
                 android:id="@+id/show_content"
@@ -88,52 +100,6 @@
                 android:layout_height="wrap_content"
                 android:padding="15dp"
                 android:text="@string/show_content" />
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/customize_notification"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <Switch
-                android:id="@+id/enable_custom_notification"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:text="@string/enable_custom_notification" />
-
-
-            <Switch
-                android:id="@+id/vibrate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:text="@string/enable_vibrate" />
-
-            <Switch
-                android:id="@+id/ringtone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:text="@string/enable_ringtone" />
-
-            <TextView
-                android:id="@+id/ringtone_select"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:text="@string/select_ringtone"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <TextView
-                android:id="@+id/ringtone_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:text="@string/default_text"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
 
             <TextView
                 android:id="@+id/textView3"

@@ -8,8 +8,8 @@ android {
         applicationId "com.fkzhang.wechatunrecalled"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 17
-        versionName "1.4.5.4"
+        versionCode 18
+        versionName "1.4.6"
     }
     buildTypes {
         release {

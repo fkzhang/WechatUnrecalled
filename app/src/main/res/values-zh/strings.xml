@@ -10,20 +10,15 @@
     <string name="recalled_msg_content">尝试撤回上一条消息 （已阻止)</string>
     <string name="comment_recall_content">尝试删除一条评论</string>
     <string name="comment_recalled_message">评论删除消息</string>
-    <string name="enable_notification">开启消息撤回通知</string>
-    <string name="enable_comment_recall_notification">开启评论删除通知</string>
     <string name="new_comment">(新评论)</string>
-    <string name="enable_new_comment_notification">开启新评论通知</string>
     <string name="deleted">[已删除]</string>
-    <string name="prevent_comments_recall">防止朋友圈撤回</string>
+    <string name="prevent_comments_recall">防止朋友圈动态撤回</string>
     <string name="prevent_moments_recall">防止评论撤回</string>
     <string name="reply">回复</string>
     <string name="audio">[语音]</string>
     <string name="customization">自定义消息</string>
-    <string name="customize_notification">自定义通知</string>
     <string name="default_text">跟随系统</string>
     <string name="emoji">[动画表情]</string>
-    <string name="enable_custom_notification">开启自定义通知</string>
     <string name="enable_ringtone">开启铃声</string>
     <string name="enable_vibrate">开启震动</string>
     <string name="notification">通知</string>
@@ -35,4 +30,9 @@
     <string name="support">如果喜欢我的作品，想支持我点这里</string>
     <string name="snslucky">查看红包照片 (试验 有时无效 如有冲突请关闭)</string>
     <string name="share_image">分享图片</string>
+    <string name="replace_wechat_notification">替代微信通知</string>
+    <string name="customize_recall_notification">自定义聊天消息撤回通知</string>
+    <string name="customize_new_comment_notification">自定义新评论回复通知</string>
+    <string name="customize_comment_recall_notification">自定义评论删除通知</string>
+    <string name="enable_notification">开启通知</string>
 </resources>

@@ -2,13 +2,14 @@ package com.fkzhang.wechatunrecalled;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -24,17 +25,15 @@ import android.widget.TextView;
 
 import com.fkzhang.wechatunrecalled.Util.SettingsHelper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
 
-public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
-
-    private static final int REQUEST_TONE_PICKER = 0;
+    private static final int REQUEST_TONE_PICKER_CUSTOM = 0;
+    private static final int REQUEST_TONE_PICKER_NEW_COMMENT = 1;
+    private static final int REQUEST_TONE_PICKER_MSG_RECALL = 2;
+    private static final int REQUEST_TONE_PICKER_COMMENT_RECALL = 3;
     private MenuItem mMenuItemIcon;
     private SettingsHelper mSettingsHelper;
-    private TextView ringtone_select;
     private TextView ringtone_name;
-    private Ringtone ringTone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,18 +43,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         setSupportActionBar(toolbar);
 
         mSettingsHelper = new SettingsHelper(this, "com.fkzhang.wechatunrecalled");
-
-        Switch enable_recall_notification = (Switch) findViewById(R.id.enable_recall_notification);
-        enable_recall_notification.setChecked(mSettingsHelper.getBoolean("enable_recall_notification", true));
-        enable_recall_notification.setOnCheckedChangeListener(this);
-
-        Switch enable_comment_recall_notification = (Switch) findViewById(R.id.enable_comment_recall_notification);
-        enable_comment_recall_notification.setChecked(mSettingsHelper.getBoolean("enable_comment_recall_notification", true));
-        enable_comment_recall_notification.setOnCheckedChangeListener(this);
-
-        Switch enable_new_comment_notification = (Switch) findViewById(R.id.enable_new_comment_notification);
-        enable_new_comment_notification.setChecked(mSettingsHelper.getBoolean("enable_new_comment_notification", false));
-        enable_new_comment_notification.setOnCheckedChangeListener(this);
 
         Switch show_content = (Switch) findViewById(R.id.show_content);
         show_content.setChecked(mSettingsHelper.getBoolean("show_content", false));
@@ -71,10 +58,30 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
         Switch snslucky = (Switch) findViewById(R.id.snslucky);
         snslucky.setChecked(mSettingsHelper.getBoolean("snslucky", true));
-        snslucky.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        snslucky.setOnCheckedChangeListener(this);
+
+        findViewById(R.id.replace_notification).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSettingsHelper.setBoolean("snslucky", isChecked);
+            public void onClick(View v) {
+                showCustomNotificationDialog("custom", R.string.replace_wechat_notification);
+            }
+        });
+        findViewById(R.id.customize_new_comment_notification).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCustomNotificationDialog("new_comment", R.string.customize_new_comment_notification);
+            }
+        });
+        findViewById(R.id.customize_msg_recall_notification).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCustomNotificationDialog("msg_recall", R.string.customize_recall_notification);
+            }
+        });
+        findViewById(R.id.customize_comment_recall_notification).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCustomNotificationDialog("comment_recall", R.string.customize_comment_recall_notification);
             }
         });
 
@@ -132,36 +139,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             }
         });
 
-        ringtone_select = (TextView) findViewById(R.id.ringtone_select);
-        ringtone_name = (TextView) findViewById(R.id.ringtone_name);
-        ringtone_select.setOnClickListener(this);
-        ringtone_name.setOnClickListener(this);
-
-        String uri = mSettingsHelper.getString("custom_ringtone", "");
-        if (TextUtils.isEmpty(uri)) {
-            ringtone_name.setText(R.string.default_text);
-        } else {
-            ringTone = RingtoneManager.getRingtone(getApplicationContext(), Uri.parse(uri));
-            ringtone_name.setText(ringTone.getTitle(this));
-        }
-
-        Switch custom_notification_enable = (Switch) findViewById(R.id.enable_custom_notification);
-        custom_notification_enable.setChecked(mSettingsHelper.getBoolean("custom_notification_enable", false));
-        custom_notification_enable.setOnCheckedChangeListener(this);
-
-        Switch ringtone_switch = (Switch) findViewById(R.id.ringtone);
-        ringtone_switch.setChecked(mSettingsHelper.getBoolean("custom_ringtone_enable", false));
-        ringtone_switch.setOnCheckedChangeListener(this);
-
-        if (!mSettingsHelper.getBoolean("custom_ringtone_enable", false)) {
-            ringtone_select.setVisibility(View.INVISIBLE);
-            ringtone_name.setVisibility(View.INVISIBLE);
-        }
-
-        Switch vibrate_switch = (Switch) findViewById(R.id.vibrate);
-        vibrate_switch.setChecked(mSettingsHelper.getBoolean("custom_vibrate_enable", false));
-        vibrate_switch.setOnCheckedChangeListener(this);
-
         final Activity thisActivity = this;
         TextView support = (TextView) findViewById(R.id.textView0);
         support.setOnClickListener(new View.OnClickListener() {
@@ -187,38 +164,24 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
+            Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+            Ringtone ringTone = RingtoneManager.getRingtone(getApplicationContext(), uri);
+            ringtone_name.setText(ringTone.getTitle(this));
             switch (requestCode) {
-                case REQUEST_TONE_PICKER:
-                    Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                case REQUEST_TONE_PICKER_CUSTOM:
                     mSettingsHelper.setString("custom_ringtone", uri.toString());
-                    ringTone = RingtoneManager.getRingtone(getApplicationContext(), uri);
-                    ringtone_name.setText(ringTone.getTitle(this));
+                    break;
+                case REQUEST_TONE_PICKER_NEW_COMMENT:
+                    mSettingsHelper.setString("new_comment_ringtone", uri.toString());
+                    break;
+                case REQUEST_TONE_PICKER_MSG_RECALL:
+                    mSettingsHelper.setString("msg_recall_ringtone", uri.toString());
+                    break;
+                case REQUEST_TONE_PICKER_COMMENT_RECALL:
+                    mSettingsHelper.setString("comment_recall_ringtone", uri.toString());
                     break;
             }
         }
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (!mSettingsHelper.getBoolean("custom_ringtone_enable", false))
-            return;
-
-//        HashMap<String,String > map = getNotifications();
-//        ArrayList<String> list = getNotificationSounds();
-//        Log.d("main", list.toString());
-//
-//
-        String uri = mSettingsHelper.getString("custom_ringtone", "");
-        final Uri currentTone = TextUtils.isEmpty(uri) ? RingtoneManager
-                .getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION) :
-                Uri.parse(uri);
-        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.ringtone_selection));
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, currentTone);
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false);
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
-        startActivityForResult(intent, REQUEST_TONE_PICKER);
     }
 
     @Override
@@ -248,39 +211,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         return super.onOptionsItemSelected(item);
     }
 
-    public ArrayList<String> getNotificationSounds() {
-        RingtoneManager manager = new RingtoneManager(this);
-        manager.setType(RingtoneManager.TYPE_NOTIFICATION);
-        Cursor cursor = manager.getCursor();
-
-        ArrayList<String> list = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            String id = cursor.getString(RingtoneManager.ID_COLUMN_INDEX);
-            String uri = cursor.getString(RingtoneManager.URI_COLUMN_INDEX);
-
-            list.add(uri + "/" + id);
-        }
-
-        return list;
-    }
-
-    public HashMap<String, String> getNotifications() {
-        RingtoneManager manager = new RingtoneManager(this);
-        manager.setType(RingtoneManager.TYPE_NOTIFICATION);
-        Cursor cursor = manager.getCursor();
-
-        HashMap<String, String> list = new HashMap<>();
-        while (cursor.moveToNext()) {
-            String id = cursor.getString(RingtoneManager.ID_COLUMN_INDEX);
-            String notificationTitle = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX);
-            String notificationUri = cursor.getString(RingtoneManager.URI_COLUMN_INDEX);
-
-            list.put(notificationTitle, notificationUri + "/" + id);
-        }
-
-        return list;
-    }
-
     private void setMenuIconTitle() {
         if (isIconEnabled()) {
             mMenuItemIcon.setTitle(R.string.hide_icon);
@@ -307,15 +237,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         switch (buttonView.getId()) {
-            case R.id.enable_recall_notification:
-                mSettingsHelper.setBoolean("enable_recall_notification", isChecked);
-                break;
-            case R.id.enable_comment_recall_notification:
-                mSettingsHelper.setBoolean("enable_comment_recall_notification", isChecked);
-                break;
-            case R.id.enable_new_comment_notification:
-                mSettingsHelper.setBoolean("enable_new_comment_notification", isChecked);
-                break;
             case R.id.show_content:
                 mSettingsHelper.setBoolean("show_content", isChecked);
                 break;
@@ -325,8 +246,89 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             case R.id.enable_comment_recall_prevention:
                 mSettingsHelper.setBoolean("prevent_comments_recall", isChecked);
                 break;
-            case R.id.ringtone:
-                mSettingsHelper.setBoolean("custom_ringtone_enable", isChecked);
+            case R.id.snslucky:
+                mSettingsHelper.setBoolean("snslucky", isChecked);
+                break;
+        }
+    }
+
+    private void requestRingtone(String tag) {
+        if (!mSettingsHelper.getBoolean(tag + "_ringtone_enable", false))
+            return;
+
+        int request_code = -1;
+        switch (tag) {
+            case "custom":
+                request_code = REQUEST_TONE_PICKER_CUSTOM;
+                break;
+            case "new_comment":
+                request_code = REQUEST_TONE_PICKER_NEW_COMMENT;
+                break;
+            case "msg_recall":
+                request_code = REQUEST_TONE_PICKER_MSG_RECALL;
+                break;
+            case "comment_recall":
+                request_code = REQUEST_TONE_PICKER_COMMENT_RECALL;
+        }
+
+        if (request_code == -1)
+            return;
+
+        String uri = mSettingsHelper.getString(tag + "_ringtone", "");
+        final Uri currentTone = TextUtils.isEmpty(uri) ? RingtoneManager
+                .getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION) :
+                Uri.parse(uri);
+        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.ringtone_selection));
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, currentTone);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
+        startActivityForResult(intent, request_code);
+    }
+
+    private void showCustomNotificationDialog(final String tag, int title) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = this.getLayoutInflater().inflate(R.layout.dialog_customize_notification, null);
+
+        final TextView ringtone_select = (TextView) view.findViewById(R.id.ringtone_select);
+        ringtone_name = (TextView) view.findViewById(R.id.ringtone_name);
+        ringtone_select.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestRingtone(tag);
+            }
+        });
+        ringtone_name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestRingtone(tag);
+            }
+        });
+
+        String uri = mSettingsHelper.getString(tag + "_ringtone", "");
+        if (TextUtils.isEmpty(uri)) {
+            ringtone_name.setText(R.string.default_text);
+        } else {
+            Ringtone ringTone = RingtoneManager.getRingtone(getApplicationContext(), Uri.parse(uri));
+            ringtone_name.setText(ringTone.getTitle(this));
+        }
+
+        Switch notification_enable = (Switch) view.findViewById(R.id.enable_notification);
+        notification_enable.setChecked(mSettingsHelper.getBoolean(tag + "_notification_enable", true));
+        notification_enable.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSettingsHelper.setBoolean(tag + "_notification_enable", isChecked);
+            }
+        });
+
+        Switch ringtone_switch = (Switch) view.findViewById(R.id.ringtone);
+        ringtone_switch.setChecked(mSettingsHelper.getBoolean(tag + "_ringtone_enable", false));
+        ringtone_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSettingsHelper.setBoolean(tag + "_ringtone_enable", isChecked);
                 if (isChecked) {
                     ringtone_select.setVisibility(View.VISIBLE);
                     ringtone_name.setVisibility(View.VISIBLE);
@@ -334,13 +336,31 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     ringtone_select.setVisibility(View.INVISIBLE);
                     ringtone_name.setVisibility(View.INVISIBLE);
                 }
-                break;
-            case R.id.vibrate:
-                mSettingsHelper.setBoolean("custom_vibrate_enable", isChecked);
-                break;
-            case R.id.enable_custom_notification:
-                mSettingsHelper.setBoolean("custom_notification_enable", isChecked);
-                break;
+            }
+        });
+
+        Switch vibrate_switch = (Switch) view.findViewById(R.id.vibrate);
+        vibrate_switch.setChecked(mSettingsHelper.getBoolean(tag + "_vibrate_enable", false));
+        vibrate_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSettingsHelper.setBoolean(tag + "_vibrate_enable", isChecked);
+            }
+        });
+
+        if (!mSettingsHelper.getBoolean(tag + "_ringtone_enable", false)) {
+            ringtone_select.setVisibility(View.INVISIBLE);
+            ringtone_name.setVisibility(View.INVISIBLE);
         }
+
+        builder.setView(view)
+                .setTitle(title)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .create()
+                .show();
     }
 }

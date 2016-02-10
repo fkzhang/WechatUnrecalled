@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">WechatUnrecalled</string>
     <string name="title_activity_main" translatable="false">MainActivity</string>
-    <string name="enable_notification">Enable message recall notification</string>
     <string name="show_content">Show recalled content (only text)</string>
     <string name="hide_icon">Hide launcher icon</string>
     <string name="show_icon">Show launcher icon</string>
@@ -11,9 +10,7 @@
     <string name="recalled_msg_content">tried to recall above message (Prevented)</string>
     <string name="comment_recalled_message">comment recalled message</string>
     <string name="comment_recall_content">tried to delete a comment</string>
-    <string name="enable_comment_recall_notification">Enable comment recall notification</string>
     <string name="new_comment">(New comment)</string>
-    <string name="enable_new_comment_notification">Enable new comment notification</string>
     <string name="deleted">[Deleted]</string>
     <string name="prevent_moments_recall">Prevent moments recall</string>
     <string name="prevent_comments_recall">Prevent comments recall</string>
@@ -23,8 +20,6 @@
     <string name="prevent_recall">Prevent recall</string>
     <string name="notification">Notification</string>
     <string name="customization">Customize message</string>
-    <string name="enable_custom_notification">Enable custom notification</string>
-    <string name="customize_notification">Customize notification</string>
     <string name="enable_vibrate">Enable vibration</string>
     <string name="enable_ringtone">Enable ringtone</string>
     <string name="select_ringtone">Select ringtone</string>
@@ -35,4 +30,9 @@
     <string name="alipay">Alipay</string>
     <string name="snslucky">Show luckymoney moments unblured image (Experimental)</string>
     <string name="share_image">Share image</string>
+    <string name="replace_wechat_notification">Replace Wechat notification</string>
+    <string name="customize_new_comment_notification">Customize new comment notification</string>
+    <string name="customize_recall_notification">Customize message recall notification</string>
+    <string name="customize_comment_recall_notification">Customize comment recall notification</string>
+    <string name="enable_notification">Enable notification</string>
 </resources>

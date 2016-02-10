@@ -50,7 +50,7 @@ import static de.robv.android.xposed.XposedHelpers.setObjectField;
 public class WechatUnrecalledHook {
     protected final SettingsHelper mSettings;
     protected final NotificationHelper mNotificationHelper;
-    private final String TAG_DELETED = "[已删除]";
+    protected final String TAG_DELETED = "[已删除]";
     protected WechatPackageNames w;
     protected Object mObject;
     protected Context mNotificationContext;
@@ -65,8 +65,8 @@ public class WechatUnrecalledHook {
     protected Class<?> mConversationClass;
     protected WechatMainDBHelper mDb;
     protected WechatSnsDBHelper mSnsDb;
-    private Class<?> SnsLuckyMoneyWantSeePhotoUI;
-    private Class<?> snsLuckyMoneyDataClass;
+    protected Class<?> SnsLuckyMoneyWantSeePhotoUI;
+    protected Class<?> snsLuckyMoneyDataClass;
 
     public WechatUnrecalledHook(WechatPackageNames packageNames) {
         this.w = packageNames;
@@ -302,7 +302,7 @@ public class WechatUnrecalledHook {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                         mSettings.reload();
-                        if (!mSettings.getBoolean("enable_new_comment_notification", false))
+                        if (!mSettings.getBoolean("new_comment_notification_enable", true))
                             return;
 
                         String s = (String) param.args[0];
@@ -326,7 +326,8 @@ public class WechatUnrecalledHook {
                         intent.putExtra("INTENT_FROMSUI", true);
                         intent.putExtra("INTENT_FROMSUI_COMMENTID", v.getAsLong("commentSvrID"));
 
-                        mNotificationHelper.displayNewCommentNotification(title, content, icon, intent);
+                        mNotificationHelper.showCommentNotification(title, content, icon,
+                                intent, "new_comment");
                     }
                 });
 
@@ -468,7 +469,7 @@ public class WechatUnrecalledHook {
             if (cursor == null || !cursor.moveToFirst())
                 return;
 
-            if (mSettings.getBoolean("enable_recall_notification", true)) {
+            if (mSettings.getBoolean("msg_recall_notification_enable", true)) {
                 final Bitmap icon = getAccountAvatar(talker);
                 int t = cursor.getInt(cursor.getColumnIndex("type"));
                 String content;
@@ -609,7 +610,7 @@ public class WechatUnrecalledHook {
 
             setCommentDeleteFlag(v);
 
-            if (!mSettings.getBoolean("enable_comment_recall_notification", true))
+            if (!mSettings.getBoolean("comment_recall_notification_enable", true))
                 return;
 
             String talker = v.getAsString("talker");
@@ -623,7 +624,8 @@ public class WechatUnrecalledHook {
             Intent resultIntent = new Intent();
             resultIntent.setClassName(mNotificationContext.getPackageName(), w.SnsMsgUI);
 
-            mNotificationHelper.displayNewCommentNotification(title, content, icon, resultIntent);
+            mNotificationHelper.showCommentNotification(title, content, icon, resultIntent,
+                    "comment_recall");
         }
     }
 
