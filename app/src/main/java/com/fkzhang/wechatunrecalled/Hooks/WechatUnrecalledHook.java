@@ -26,6 +26,7 @@ import com.fkzhang.wechatunrecalled.Util.WechatSnsDBHelper;
 import com.fkzhang.wechatunrecalled.WechatPackageNames;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -38,7 +39,6 @@ import de.robv.android.xposed.XposedHelpers;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
-import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
@@ -73,6 +73,26 @@ public class WechatUnrecalledHook {
         mSettings = new SettingsHelper("com.fkzhang.wechatunrecalled");
         mAvatarCache = new HashMap<>();
         mNotificationHelper = new NotificationHelper(packageNames);
+    }
+
+    public static void findAndHookConstructor(String className, ClassLoader classLoader, Object... parameters) {
+        Class<?> cls = findClass(className, classLoader);
+        Class<?>[] parameterTypes = new Class[parameters.length - 1];
+        for (int i = 0; i < parameters.length - 1; i++) {
+            if (parameters[i] instanceof String) {
+                parameterTypes[i] = findClass((String) parameters[i], classLoader);
+            } else if (parameters[i] instanceof Class) {
+                parameterTypes[i] = (Class<?>) parameters[i];
+            }
+        }
+        try {
+            Constructor<?> constructor = cls.getDeclaredConstructor(parameterTypes);
+            constructor.setAccessible(true);
+            XC_MethodHook callback = (XC_MethodHook) parameters[parameters.length - 1];
+            XposedBridge.hookMethod(constructor, callback);
+        } catch (Throwable t) {
+            XposedBridge.log(t);
+        }
     }
 
     public void hook(final ClassLoader loader) {
@@ -116,6 +136,7 @@ public class WechatUnrecalledHook {
         } catch (Throwable t) {
             XposedBridge.log(t);
         }
+
     }
 
     protected void hookRecall(final ClassLoader loader) {
@@ -348,7 +369,7 @@ public class WechatUnrecalledHook {
 
     protected void hookDbObject(final ClassLoader loader) {
         // get database object
-        XposedHelpers.findAndHookConstructor(w.storageClass1, loader,
+        findAndHookConstructor(w.storageClass1, loader,
                 w.storageMethod1, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -549,7 +570,6 @@ public class WechatUnrecalledHook {
             cursor.close();
             mDb.insertSystemMessage(talker, talkerId, replacemsg, createTime + 1);
             updateMessageCount();
-
         } catch (Throwable t) {
             XposedBridge.log(t);
         }
@@ -868,18 +888,6 @@ public class WechatUnrecalledHook {
             log(t);
         }
 
-    }
-
-
-    protected void unsetSnsDeleteFlag(ContentValues v) {
-        Object contentObject = mSnsDb.decodeBlob(mSnsContentClass, v.getAsByteArray("content"));
-        if (contentObject == null)
-            return;
-
-        String content = WechatSnsDBHelper.removeDeletedTag(mSnsDb.getSnsContent(contentObject));
-        setObjectField(contentObject, w.snsContentField, content);
-        v.put("content", WechatSnsDBHelper.encodeContentBlob(contentObject));
-        mSnsDb.update("SnsInfo", v, "snsId = ?", new String[]{v.getAsString("snsId")});
     }
 
     protected void setSnsDeleteFlag(ContentValues v) {

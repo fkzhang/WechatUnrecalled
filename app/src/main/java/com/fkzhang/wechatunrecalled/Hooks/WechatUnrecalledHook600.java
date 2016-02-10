@@ -13,7 +13,7 @@ import de.robv.android.xposed.XposedHelpers;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
-import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
+import static de.robv.android.xposed.XposedHelpers.findConstructorExact;
 
 /**
  * Created by fkzhang on 1/16/2016.
@@ -89,21 +89,38 @@ public class WechatUnrecalledHook600 extends WechatUnrecalledHook {
     }
 
     protected void hookDbObject(final ClassLoader loader) {
-        findAndHookConstructor(w.storageClass1, loader, w.storageMethod1, new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                mStorageObject = param.thisObject;
-                init(loader);
-                if (mDb == null) {
-                    try {
-                        mDb = new WechatMainDBHelper(param.args[0]);
-                        mNotificationHelper.setDB(mDb);
-                    } catch (Throwable t) {
-                        log(t);
+        XposedBridge.hookMethod(findConstructorExact(w.storageClass1, loader, w.storageMethod1),
+                new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        mStorageObject = param.thisObject;
+                        init(loader);
+                        if (mDb == null) {
+                            try {
+                                mDb = new WechatMainDBHelper(param.args[0]);
+                                mNotificationHelper.setDB(mDb);
+                            } catch (Throwable t) {
+                                log(t);
+                            }
+                        }
                     }
-                }
-            }
-        });
+                });
+
+//        findAndHookConstructor(w.storageClass1, loader, w.storageMethod1, new XC_MethodHook() {
+//            @Override
+//            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+//                mStorageObject = param.thisObject;
+//                init(loader);
+//                if (mDb == null) {
+//                    try {
+//                        mDb = new WechatMainDBHelper(param.args[0]);
+//                        mNotificationHelper.setDB(mDb);
+//                    } catch (Throwable t) {
+//                        log(t);
+//                    }
+//                }
+//            }
+//        });
     }
 
     protected void updateMessageCount() {
