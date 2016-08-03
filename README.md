@@ -1,5 +1,8 @@
 # WechatUnrecalled 
 
+因为我的作品多次遭到盗版所以不再开源 请大家谅解 
+有问题的可以加我微信 fkzhang_helper 进入我的测试/讨论群
+
 Prevent Wechat recalling chat messages and comments from sns (moments).
 
 防止微信撤回聊天消息和朋友圈回复
