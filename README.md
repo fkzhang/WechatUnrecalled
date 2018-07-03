@@ -2,8 +2,6 @@
 
 因为我的作品多次遭到盗版所以不再开源 请大家谅解 
 
-论坛：http://bbs.xwjqr.com/
-
 Prevent Wechat recalling chat messages and comments from sns (moments).
 
 防止微信撤回聊天消息和朋友圈回复
