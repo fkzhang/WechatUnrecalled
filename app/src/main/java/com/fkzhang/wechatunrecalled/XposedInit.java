@@ -33,7 +33,7 @@ public class XposedInit implements IXposedHookLoadPackage {
 
 
         try {
-            Object activityThread = callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
+            Object activityThread = callStaticMethod(findClass("android.app.ActivityThread", null),  "currentActivityThread");
             Context mContext = (Context) callMethod(activityThread, "getSystemContext");
 
             try {
