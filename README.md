@@ -2,6 +2,8 @@
 
 因为我的作品多次遭到盗版所以不再开源 请大家谅解 
 
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/P5P41MYMK)
+
 Prevent Wechat recalling chat messages and comments from sns (moments).
 
 防止微信撤回聊天消息和朋友圈回复
